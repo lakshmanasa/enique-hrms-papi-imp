@@ -1,0 +1,77 @@
+p:
+ port: "8081"
+http:
+ host: "localhost"
+
+mule:
+ env: "local"
+ 
+send1:
+ fromaddress: "asamohanlakshman@gmail.com"
+ toaddress: "eniquehrms@gmail.com"
+ username: "asamohanlakshman@gmail.com"
+ password: "![9CQ8/Hc/FLBT90HZo61iKg==]"
+ host: "smtp.gmail.com"
+ port: "587"
+  
+send2:
+ toaddress: "asamohanlakshman@gmail.com"
+
+send3:
+ fromaddress: "eniquehrms@gmail.com"
+ username: "eniquehrms@gmail.com"
+ password: "![jlE/FoSnltLyZp8WRZpElg==]"
+ host: "smtp.gmail.com"
+ port: "587"
+ 
+
+onnewmessage:
+ host: "imap.gmail.com"
+ port: "993"
+ username: "eniquehrms@gmail.com"
+ password: "![MyyCZfPnW7HRII/4kWRJow==]"
+
+gsheets:
+ clientid: "![7haF58/HR85E2/+Rh5YJ7ynCnzmV9n/vnfzvCOvH9t4+d1WUqLgmPW5Jl8Hd8vvLCbUp4BOiLClZdE01BSQmAfwwNtC5cg+RXN7boxmMzM4=]"
+ clientsecret: "![Z4u+BDNXscaJ1tt6MC5lDA+YS1ltypAoUsXBKgMvCUwoHVLLIRoGR/9FVNzBU0Tx]"
+ sheetid: "![x9kTZ+9FDjUOYDIRuHqdRzXEfK+N6zvrigBQObgPvYA8+ACmA8SiThgQEZDMdfh2]"
+ 
+system:
+ host: "sapi-hr.us-e2.cloudhub.io"
+ port: "80"
+ basepath: "/api/v1/sapi"
+ path:
+  leavepath:
+     getById: "/leave/{id}"
+     getByqueryParams: "/leave"
+     patchById: "/leave/{id}"
+     postLeave: "/leave"
+  employee:
+    getAll: "/employee"
+    getById: "/employee/{id}"
+    deleteEmployee: "/employee/{id}"
+  formerEmployee:
+   postFormerEmployee: "/formerEmployee"
+  personalDetail:
+   getById: "/personalDetails/{id}"
+   deletePersonalDetail: "/personalDetails/{id}"
+  project:
+   getById: "/project/{id}"
+   deleteProject: "project/{id}"
+  department:
+   deleteDepartment: "/department/{id}"
+  timelog:
+   postOptional: "/optionalHoliday"
+   getAttendance: "/attendance"
+   getLeaves: "/leave"
+   postLeaves: "/leave/{id}"
+   sqlwhereClause: "/attendance"
+   attendanceDetails: "/attendance/{id}"
+   employeeDetails: "/employee"
+   applicant: "/applicant/{id}"
+   postapplicant: "/applicant"
+   employeeRecords: "/applicant"
+   postemployee: "/employee"
+  compensation:
+   patchCompensation: "/compensation/{id}"
+   getByIdCompensation: "/compensation/{id}"

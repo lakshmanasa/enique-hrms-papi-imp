@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<flow name="timeLogPostFlow" doc:id="f2bb283a-3860-4aad-9a69-3c6a17bb8f78" initialState="started">
+		<set-variable value="#[payload]" doc:name="ACTUAL PAYLOAD" doc:id="f0a0ccfd-83b1-4f61-87f5-0f7e8d6bb555" variableName="actualPayload"/>
+		<set-variable value="#[attributes.queryParams.soqlWhereClause]" doc:name="soqlWhereClause" doc:id="57b1c08e-804e-41ee-ae1a-04c10d508a50" variableName="soqlWhereClause"/>
+		<choice doc:name="Choice" doc:id="5cd80c31-c59e-46bb-9bf6-ef2cd26b405f" >
+			<when expression="#[vars.soqlWhereClause != null]">
+				<ee:transform doc:name="Transform Message" doc:id="898646d9-4e93-4e6a-888e-a16d32e4e050">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<set-variable value="#[vars.afterUpdation]" doc:name="Set Variable" doc:id="b2023546-5644-4a76-b664-976dc52becd6" variableName="soqlWhereClause" />
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="GIVING queryParams,path,method as variables" doc:id="42b4a4ba-1079-4f12-a4a9-cd47e274395c">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[Mule::p('system.path.timelog.sqlwhereClause')
+]]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA['GET']]></ee:set-variable>
+				<ee:set-variable variableName="queryParams" ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	"soqlWhereClause" : vars.soqlWhereClause default {}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="2bb55e2b-36f3-4d56-a817-12dbba7cd48d" name="salesforce-sys-api-request"/>
+		<ee:transform doc:name="Reducing checkInTime from ARRAY to STRING" doc:id="bbbc2b56-cc36-46a3-baf6-603549d3e51b" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="totalHoursLogged" ><![CDATA[%dw 2.0
+output application/json
+var totalHoursLogged = payload.totalHoursLogged__c reduce($$++$)
+---
+totalHoursLogged]]></ee:set-variable>
+				<ee:set-variable variableName="checkintime" ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+var checkintime = payload.checkInTime__c reduce($$++$)
+---
+checkintime]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[payload.checkOutTime__c reduce($$++$)]" doc:name="Taking checkOutTime as variable" doc:id="693a2739-1f4c-43b1-a75e-d3796f5e4138" variableName="checkOutTimeVariable"/>
+		<ee:transform doc:name="Adding null to string" doc:id="f31f616b-e90b-4377-bfe8-4e82a919403c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="addingNull" ><![CDATA[%dw 2.0
+output application/json
+%dw 2.0
+output application/json
+var a = payload reduce($$++$$)
+var b = if(a.date__c == "null")
+{
+    "date__c": null
+}
+  else
+  {
+      "date__c": a.date__c
+  }
+---
+b.date__c]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="2ab95691-b3bd-463f-a712-0cd8161b5ea8" >
+			<when expression="#[!isEmpty(vars.addingNull) and (vars.checkOutTimeVariable != 'null') and ((payload.date__c reduce($$++$)) as Date != now() as Date)]">
+				<set-payload value="#[vars.actualPayload]" doc:name="Setting Payload to vars.actualPayload" doc:id="7577c928-fb6e-4923-a541-9ed55ba49fcd" />
+				<ee:transform doc:name="Sending path and method as variables" doc:id="478bf55a-7e28-45b8-a284-155eb5cafc5a">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="path"><![CDATA[Mule::p('system.path.timelog.attendanceDetails')]]></ee:set-variable>
+						<ee:set-variable variableName="method"><![CDATA['PATCH']]></ee:set-variable>
+						<ee:set-variable variableName="uriParams"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"id": payload.employeeId[0] default {}
+}]]></ee:set-variable>
+						<ee:set-variable variableName="queryParams"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams default {}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Mapping payload to insert null values to Salesforce" doc:id="14d34edf-9158-4b93-a687-2f41faa0514b">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+payload map {
+	checkInTime: "null",
+	checkOutTime: "null",
+	date: "null",
+	employeeId: $.employeeId,
+	id: $.id,
+	Name: $.employeeName,
+	totalHoursLogged: "null"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference" doc:id="38160fff-7139-41f5-8b66-4cbe56faecb2" name="salesforce-sys-api-request" />
+				<ee:transform doc:name="JAVA to JSON" doc:id="06ca6689-9755-431e-87eb-4d6d0aeb13df">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[vars.soqlWhereClause]" doc:name="setting varable as soqlwhereclause" doc:id="e812ee4d-5a42-4737-ba14-b91a4776c6c8" variableName="soqlWhereClause" />
+				<set-variable value="#[vars.soqlWhereClause]" doc:name="After updation soql where clause" doc:id="76026b31-a844-41b7-a432-74dabe9e1205" variableName="afterupdation"/>
+				<set-payload value="#[vars.actualPayload]" doc:name="Setting payload to Actual payload" doc:id="afe5fe36-db7e-4982-b51a-d3a5db4da0dd" />
+				<flow-ref doc:name="Flow Reference" doc:id="d86eff58-ecc8-48f4-8de9-a6879f35cf09" name="timeLogPostFlow" />
+			</when>
+			<when expression="#[!isEmpty(vars.addingNull) and(vars.checkOutTimeVariable != 'null') and ((payload.date__c reduce($$++$)) as Date == now() as Date)]">
+				<ee:transform doc:name="Transform Message" doc:id="fcb0acba-aabb-4bc6-8335-0ea57d9e1da1">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "Already Logged Out for Today."
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[!isEmpty(vars.addingNull) and (vars.checkintime != 'null') and ((payload.date__c reduce($$++$)) as Date == now() as Date)]">
+				<ee:transform doc:name="Taking checkOutTime as Variable" doc:id="3a741b6d-3095-4b50-827f-75fc4efe390c">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="checkOutTime"><![CDATA[%dw 2.0
+output application/json
+var checkOutTime = now() as Time {format: "HH:mm:ss"}
+---
+checkOutTime
+]]></ee:set-variable>
+						<ee:set-variable variableName="checkoutDate"><![CDATA[%dw 2.0
+output application/json
+var checkoutDate = now() as Date
+---
+checkoutDate]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Converting TotalTimeLogged from PERIOD format TO {hh:mm:ss}" doc:id="4397983c-b6d5-406b-aab7-89e1ca18ee91">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="mappedTotalLoginTime"><![CDATA[%dw 2.0
+output application/json
+var a = vars.checkintime as Time
+var b = vars.checkOutTime as Time
+var c = abs(a.minutes - b.minutes)
+var d = abs(a.seconds - b.seconds)
+var z = abs(a.hour - b.hour)
+var g = if(c <= 9)
+{
+    "Minutes": 0 as String ++ c as String
+}
+  else
+  {
+      "Minutes": c
+  }
+var e = if(d <= 9)
+{
+    "Seconds": 0 as String ++ d as String
+}
+  else
+  {
+      "Seconds": d
+  }
+var h = if(z <= 9)
+{
+    "Hours": 0 as String ++ z as String
+}
+  else
+  {
+      "Hours": z
+  }
+---
+h.Hours ++ ":" ++ g.Minutes ++ ":" ++ e.Seconds
+
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<set-payload value="#[vars.actualPayload]" doc:name="Setting PAYLOAD to vars.ActualPayload" doc:id="d7f080fb-e4db-4ac1-99d3-3c8a7934b088" />
+				<ee:transform doc:name="Sending path and method as variables" doc:id="97dfbe0a-a479-4b26-a7ff-b6426b620b26">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="queryParams"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams default {}]]></ee:set-variable>
+						<ee:set-variable variableName="uriParams"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"id": payload.employeeId[0] default {}
+}]]></ee:set-variable>
+						<ee:set-variable variableName="method"><![CDATA['PATCH']]></ee:set-variable>
+						<ee:set-variable variableName="path"><![CDATA[Mule::p('system.path.timelog.attendanceDetails')]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="MAPPING PAYLOAD for SALESFORCE" doc:id="ce151341-c6ff-47f7-9043-5f3468cc668f">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+payload map {
+	checkInTime: vars.checkintime,
+	checkOutTime: vars.checkOutTime,
+	date: $.date,
+	employeeId: $.employeeId,
+	id: $.id,
+	Name: $.employeeName,
+	totalHoursLogged: vars.mappedTotalLoginTime
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference" doc:id="c1428377-5278-4d8c-9ac9-95be93a692b5" name="salesforce-sys-api-request" />
+				<ee:transform doc:name="FINAL OUTPUT TAKEN as VARIABLE" doc:id="220a50d4-c63f-4cc3-904c-d85b1eeefc89">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+
+"MESSAGE": "Successfully Logged Out",
+"Login Time": vars.checkInTime,
+"Log Out Time": vars.checkOutTime,
+"Login Date": vars.checkoutDate,
+"Total Time Logged In" : vars.mappedTotalLoginTime
+
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+					</ee:variables>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Taking Current date and checkInTime as Variables" doc:id="7781791e-bdfa-41cc-a6c7-dcf07144a98c" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="checkInTime" ><![CDATA[%dw 2.0
+output application/json
+var checkInTime = now() as Time {format: "HH:mm:ss"}
+---
+
+checkInTime
+]]></ee:set-variable>
+						<ee:set-variable variableName="date" ><![CDATA[%dw 2.0
+output application/json
+var date = now() as Date
+---
+date]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<set-payload value="#[vars.actualPayload]" doc:name="Setting PAYLOAD to vars.actualPayload" doc:id="56796474-e86b-42aa-9ac7-c3ce0bd5ea80" />
+				<ee:transform doc:name="Sending path and method as variables" doc:id="d64534a0-e2e9-4ec8-aff0-579b5b622e7b">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="path"><![CDATA[Mule::p('system.path.timelog.attendanceDetails')
+]]></ee:set-variable>
+						<ee:set-variable variableName="method"><![CDATA['PATCH']]></ee:set-variable>
+						<ee:set-variable variableName="uriParams"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"id": payload.employeeId[0] default {}
+}]]></ee:set-variable>
+						<ee:set-variable variableName="queryParams"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams default {}
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="MAPPING PAYLOAD FOR SALESFORCE" doc:id="957f9ecd-228e-4d91-a76a-8bb792d35cf5">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+payload map {
+	date: $.date,
+	employeeId: $.employeeId,
+	checkInTime: vars.checkInTime,
+	id: $.id,
+	Name: $.employeeName,
+	date: vars.date,
+	totalHoursLogged: $.totalHoursLogged
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference" doc:id="a9912bbf-467b-43c2-baa0-ef4b8b1f979c" name="salesforce-sys-api-request"/>
+				<ee:transform doc:name="Final Output" doc:id="33ac1550-f171-447a-8acd-d41b4575b053">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"MESSAGE" : "SUCCESSFULLY LOGGED IN",
+	"Login Time": vars.checkInTime,
+	"Login Date": vars.date
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<error-handler ref="globalErrorHandlerError_Handler" />
+	</flow>
+	<flow name="SendEmailToEmployeesByTotalHoursLoggedIn" doc:id="5ab19c95-0727-427c-9d28-857fc14cd071" >
+		<scheduler doc:name="Scheduler" doc:id="7187fbbf-97c6-435c-a3b7-89f520fdb83b" >
+			<scheduling-strategy >
+				<cron expression="0 0 0 ? * TUE,WED,THU,FRI,SAT *" />
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="Taking yesterday's date as variable date" doc:id="74c1d585-8e46-403d-a76d-fe4e3eb572d6" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="date" ><![CDATA[%dw 2.0
+output application/json
+var date = (now() as Date) - |P1D|
+---
+(date) as String]]></ee:set-variable>
+				<ee:set-variable variableName="dateForEmail" ><![CDATA[%dw 2.0
+output text
+var date = now() - |P1D|
+---
+date as Date {format: "dd-MMMM-yyyy"}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="taking a dynamic  logic of soqlWhereClause in variable" doc:id="95e3aee9-c4c8-46fa-81a6-beae602b45ae" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="soqlWhereClause" ><![CDATA[%dw 2.0
+output application/json
+var soqlWhereClause = "date__c=" ++ "'" ++  vars.date ++  "'"
+---
+soqlWhereClause]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="GIVING queryParams,path,method as variables" doc:id="a5d87bf3-90b9-42d6-83cb-344c61bf1d97" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="queryParams" ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	"soqlWhereClause" : vars.soqlWhereClause default {}
+}]]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA[Mule::p('system.path.timelog.sqlwhereClause')]]></ee:set-variable>
+				<ee:set-variable variableName="method" ><![CDATA['GET']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="a603ede5-0b09-4e8a-9f96-562fd3708924" name="salesforce-sys-api-request"/>
+		<ee:transform doc:name="MAPPING PAYLOAD FROM ARRAY TO OBJECT" doc:id="59a7e161-964c-4e21-946d-28fa8c018734" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+var mapData = payload map {
+    "mappedData": if($.totalHoursLogged__c == "null")
+    {
+    	"totalHoursLogged": "00:00:00" ,
+        "employeeId": $.employeeId__c,
+         "Name": $.Name
+    }
+    else
+    {
+    	"totalHoursLogged": $.totalHoursLogged__c,
+        "employeeId": $.employeeId__c,
+    "Name": $.Name
+    } 
+    
+}
+---
+mapData.mappedData]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload.totalHoursLogged]" doc:name="Taking totalHoursLogged as Variable" doc:id="4ba76a2c-f927-4e51-9ce1-82fd610dfb67" variableName="totalHoursLoggedTimeFormat"/>
+		<foreach doc:name="For Each" doc:id="c35b7f51-56a8-4d06-b692-90609721a1ca" collection="#[payload]">
+			<choice doc:name="Choice" doc:id="bf594a63-8ee1-405c-8942-aa064de74cc1" >
+				<when expression='#[payload.totalHoursLogged &lt; ("09:00:00") as Time]'>
+					<ee:transform doc:name="Taking employeeId as variable" doc:id="b165cdd9-003e-4ae6-90e8-d8e65ddc32ef">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="employeeIdforSoQl"><![CDATA[%dw 2.0
+output text
+var employeeIdforSoQl = payload.employeeId
+---
+employeeIdforSoQl]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<set-variable value='#[((vars.storingEmpIdAndName default []) + ("EmployeeName:" ++ payload.Name ++ ", EmployeeId: " ++ payload.employeeId)) reduce($$++$)]' doc:name="employeeIdVariable" doc:id="242db973-5629-4a5d-a113-37552e3a09e7" variableName="storingEmpIdAndName" />
+					<ee:transform doc:name="Writing a dynamic query of soqlWhereClause" doc:id="c6045991-18a2-4de1-81bc-32ae0b3bbf6d">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="soqlWhereClause"><![CDATA[%dw 2.0
+output application/json
+var soqlWhereClause = "employeeId__c=" ++ "'" ++  vars.employeeIdforSoQl ++  "'"
+---
+soqlWhereClause]]></ee:set-variable>
+							<ee:set-variable variableName="path"><![CDATA[Mule::p('system.path.timelog.employeeDetails')]]></ee:set-variable>
+							<ee:set-variable variableName="method"><![CDATA['GET']]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="GIVING queryParams,path,method as variables" doc:id="702e96b6-820b-4a6d-b888-3142a80b280d">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="queryParams"><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	"soqlWhereClause" : vars.soqlWhereClause default {}
+}]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="Flow Reference" doc:id="2804a45c-c9b9-49af-8834-4e7fb6eded11" name="salesforce-sys-api-request" />
+					<ee:transform doc:name="Reducing Payload to object" doc:id="c38f2a1e-b668-4110-b3f8-e28cbf555013">
+			<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload reduce($$++$)]]></ee:set-payload>
+			</ee:message>
+						<ee:variables>
+						</ee:variables>
+		</ee:transform>
+					<ee:transform doc:name="Taking Name as Variable" doc:id="db71d9e3-45a7-464e-9f9e-45e48376199c">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="Namee"><![CDATA[%dw 2.0
+output text
+var Namee = payload.Name
+---
+Namee
+]]></ee:set-variable>
+							<ee:set-variable variableName="emailId" ><![CDATA[%dw 2.0
+output application/json
+var emailId = payload.emailId__c
+---
+emailId
+]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<parse-template doc:name="Parse Template" doc:id="96674e6c-5258-41a8-9f1a-c2b7bb54f7ed" location="emaillnew.html" target="first">
+					</parse-template>
+					<email:send doc:name="Send" doc:id="8a26b09a-52ca-4c6a-ab69-68ed831fbae3" fromAddress="${send3.fromaddress}" subject="Absent Notification" config-ref="Email_SMTP">
+						<email:to-addresses>
+							<email:to-address value="#[vars.emailId]" />
+						</email:to-addresses>
+						<email:body contentType="text/html">
+							<email:content ><![CDATA[#[vars.first]]]></email:content>
+						</email:body>
+					</email:send>
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="3d8af3c8-57f0-4bdf-9d4d-d992ac4106d3" message='#["Message": "Employee " ++ payload.employeeId ++ "," ++ payload.Name ++ " is Present"]'/>
+				</otherwise>
+			</choice>
+		</foreach>
+		<ee:transform doc:name="Final Output" doc:id="881220c5-9abe-4f40-8bf9-0bdbccb350fa">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	("Message": "Absent Notification Successfully Sent.") if !isEmpty(vars.storingEmpIdAndName),
+	("Absent employee's are": vars.storingEmpIdAndName) if !isEmpty(vars.storingEmpIdAndName),
+	("Message":"No employee's were absent yesterday") if isEmpty(vars.storingEmpIdAndName)
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+		<error-handler ref="globalErrorHandlerError_Handler" />
+	</flow>
+</mule>

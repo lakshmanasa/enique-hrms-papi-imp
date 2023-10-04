@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="time-log-test-suite.xml" />
+	<munit:test name="time-log-test-suite-timeLogPostFlowTest" doc:id="886592e9-71ae-40d5-949c-b135421c1569" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="77cde9d7-47b3-463f-84e3-87b9bc39337c" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2bb55e2b-36f3-4d56-a817-12dbba7cd48d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/WhenAllvaluesNull-1stFlowReference.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="641bd8df-0b02-4b7c-ab80-3b54394d8255" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="a9912bbf-467b-43c2-baa0-ef4b8b1f979c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/WhenAllValuesNull-upsert.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="31818cfd-cd3f-45a4-9050-f392b4aeff3c" >
+				<munit:payload value="#[readUrl('classpath://timeLog/inputPayload.dwl')]" />
+				<munit:attributes value="#[ { &quot;queryParams&quot;:{&quot;soqlWhereClause&quot;: &quot;employeeId__c='ES000027'&quot;}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to timeLogPostFlow" doc:id="5d9fe3d4-65e9-4c19-94e0-85687c86bcfa" name="timeLogPostFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="bc7c5b37-6b29-4f7b-9365-134839878d17" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="time-log-test-suite-timeLogPostFlowTest1" doc:id="63893296-9982-488a-95ae-dd2719575946" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b4dc2859-25fb-4921-8f86-7fc71568e46c" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2bb55e2b-36f3-4d56-a817-12dbba7cd48d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/afterCheckIn.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9e370a37-be93-4a70-b9b7-5fdd3a470133" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="c1428377-5278-4d8c-9ac9-95be93a692b5" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/WhenAllValuesNull-upsert.dwl')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="230f7f85-2f31-4152-ae3e-e0abbede1341" >
+				<munit:payload value="#[readUrl('classpath://timeLog/inputPayload.dwl')]" />
+				<munit:attributes value="#[ { &quot;queryParams&quot;:{&quot;soqlWhereClause&quot;: &quot;employeeId__c='ES000027'&quot;}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to timeLogPostFlow" doc:id="13559033-e25b-4fb9-9770-16c59117dd2b" name="timeLogPostFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="50a6177e-53ac-4c22-927a-4dc906eb689d" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="time-log-test-suite-timeLogPostFlowTest2" doc:id="ebab2712-1d98-4b39-9cc8-ac74fa101605" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5b4150a6-ebe3-4ed4-8027-65bedf18efe5" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2bb55e2b-36f3-4d56-a817-12dbba7cd48d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/afterCheckingOut.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to timeLogPostFlow" doc:id="bccebf39-73ab-4810-a49e-148525981471" name="timeLogPostFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="16d8274e-7695-4595-99e3-3af6a9712710" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="time-log-test-suite-timeLogPostFlowTest3" doc:id="122e5285-d40e-4b59-9fcd-0b57cd1a01ce" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1e70db30-b272-4b09-9086-e1c8b567fb53" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2bb55e2b-36f3-4d56-a817-12dbba7cd48d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/checkInAnotherDay.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="24d6c6a2-ee18-4c25-bf56-65d899c21015" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="38160fff-7139-41f5-8b66-4cbe56faecb2" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/WhenAllValuesNull-upsert.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5ee16b45-b0cb-4933-bbe4-312f2a7685a6" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d86eff58-ecc8-48f4-8de9-a6879f35cf09" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/WhenAllValuesNull-upsert.dwl')]" />
+				</munit-tools:then-return>
+				<munit-tools:then-call flow="timeLogPostFlow" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="da33956d-9fb0-475b-bc22-60c934fb97fd" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d86eff58-ecc8-48f4-8de9-a6879f35cf09" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/WhenAllvaluesNull-1stFlowReference.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ca1407d5-66bf-4900-95f1-b2dfa852ad59">
+				<munit:payload value="#[readUrl('classpath://timeLog/inputPayload.dwl')]" />
+				<munit:attributes value="#[ { &quot;queryParams&quot;:{&quot;soqlWhereClause&quot;: &quot;employeeId__c='ES000027'&quot;}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to timeLogPostFlow" doc:id="a20f4049-7fee-4f24-9954-adfe49d5c044" name="timeLogPostFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="d09e3cda-baab-4d14-9408-b183b43fe182" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="time-log-test-suite-SendEmailToEmployeesByTotalHoursLoggedInTest" doc:id="238cd586-4c03-494c-a3c8-05d68fd8cbe3" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9c0b5613-f88d-4d1c-8cb0-88b49f7e90d4" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="a603ede5-0b09-4e8a-9f96-562fd3708924" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/gettingAttendances.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="bf038e2b-013a-4e24-a19d-e8cd629b3bd7" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2804a45c-c9b9-49af-8834-4e7fb6eded11" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/gettingFromEmployee.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to SendEmailToEmployeesByTotalHoursLoggedIn" doc:id="54f83914-03be-4272-87f1-b39ac65fd634" name="SendEmailToEmployeesByTotalHoursLoggedIn"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b416a03a-8fd2-4e41-8f17-78fff512da2f" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="time-log-test-suite-SendEmailToEmployeesByTotalHoursLoggedInTest1" doc:id="70c13559-be2e-4b43-a2d4-5a8a40f5d542" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a83c97b4-f6f3-4348-b0af-a770eb0483c0" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="a603ede5-0b09-4e8a-9f96-562fd3708924" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://timeLog/gettingAttendances1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to SendEmailToEmployeesByTotalHoursLoggedIn" doc:id="b1a9b95b-1f7b-4cdc-8849-5cd49b0be7b2" name="SendEmailToEmployeesByTotalHoursLoggedIn"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b7c429e3-769a-4861-b76c-d325c8d89e49" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

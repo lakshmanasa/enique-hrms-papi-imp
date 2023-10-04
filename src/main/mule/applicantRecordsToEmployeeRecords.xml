@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="employeeRecordsFlow" doc:id="724ec5b2-d244-4243-8dbc-2f7d9dc2ba68" >
+		<set-variable value="#[attributes.queryParams.soqlWhereClause]" doc:name="SoqlWhereClauseAsVariable" doc:id="60526d4d-c320-49a5-97f0-cce2eb57c194" variableName="soqlWhereClause" />
+		<ee:transform doc:name="path,method,queryParams,actualPayload as variables" doc:id="5f4828ec-9950-44b4-ba6b-6945edd2d072" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="path" ><![CDATA[Mule::p('system.path.timelog.employeeRecords')]]></ee:set-variable>
+				<ee:set-variable variableName="method" ><![CDATA['GET']]></ee:set-variable>
+				<ee:set-variable variableName="queryParams" ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	"soqlWhereClause" : vars.soqlWhereClause default {}
+}]]></ee:set-variable>
+				<ee:set-variable variableName="actualPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map {
+employeeId: $.employeeId,	
+dateOfJoining: $.dateOfJoining,
+gender: $.gender,
+country: $.country,
+state: $.state,
+managerId: $.managerId,
+deptId: $.deptId,
+nickName: $.nickName,
+language: $.language,
+yearOfJoining: $.yearOfJoining
+
+
+
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference to hit common http request" doc:id="0b77c363-068a-4e4b-ad10-a869f98b2df4" name="salesforce-sys-api-request" />
+		<ee:transform doc:name="Mapping payload coming from Salesforce" doc:id="d386b459-ff6b-40ac-ae53-ab9961ed9578" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var a = 
+payload map {
+
+  employeeName: $.Name,
+  mobileNumber: $.contactNumber__c,
+  emailId: $.emailId__c,
+  currentLocation: $.currentLocation__c,
+  dateOfBirth: $.dateofBirth__c,
+  experience: $.experience__c,
+  highestQualification: $.qualification__c
+}
+
+var b = vars.actualPayload
+var c = b reduce($)
+
+
+---
+{(a+c)}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="path,method and converting payload to array to post to salesforce" doc:id="cb9ab87b-eeea-4b39-8963-caaaab141786" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var a = payload
+---
+[a]]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="path" ><![CDATA[Mule::p('system.path.timelog.postemployee')]]></ee:set-variable>
+				<ee:set-variable variableName="method" ><![CDATA['POST']]></ee:set-variable>
+				<ee:set-variable variableName="empName" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.employeeName]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference to hit common http request" doc:id="b681f10d-01e0-48c6-a941-6f3d170e073a" name="salesforce-sys-api-request" />
+		<ee:transform doc:name="Output" doc:id="dfe017fb-6790-4b65-b51c-7710388a8ea4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(payload.successful == true as Boolean ){
+    "Message": "Applicant records successfully updated in employee records for employee " ++ vars.empName as String 
+} else {
+    "Message": "Applicant records already exists for employee " ++ vars.empName as String
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="globalErrorHandlerError_Handler" />
+	</flow>
+</mule>

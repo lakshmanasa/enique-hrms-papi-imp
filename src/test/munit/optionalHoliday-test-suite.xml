@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="optionalHoliday-test-suite.xml" />
+	<munit:test name="optionalHoliday-test-suite-optionalholidayapiFlowTest" doc:id="dd3985cf-03c4-4893-903e-1b810259259d" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9e246ed9-9ad5-47ad-8b3a-8f2dfec0017d" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e3f9b11f-c703-45a7-929a-48f07c38a534" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/gettingOptionalHolidays.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="19ffa219-46c6-4d67-a7f2-69e21ee5d136" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9adf07ad-6430-444c-8400-0f78f037c103" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/gettingAttendances.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1f1e7b0e-8749-4989-8942-5730b082408a" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="60e226cb-aacf-46f0-9d3e-f9ae46038506" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/gettingLeaveData.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1e6b3841-002a-48b2-b126-a83231fdbce9" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="6210f28d-c96e-4108-9deb-af773d1c9706" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/upsertingLeavesBalance.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a728a5a5-7377-44f5-8bfe-1b911fcd3a31" >
+				<munit:payload value="#[readUrl('classpath://optionalHoliday/inputPayload.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to optionalholidayapiFlow" doc:id="1b215471-30e1-4d0f-b5f5-24267fc2fc10" name="optionalholidayapiFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="cdfc1575-ff70-4d0f-8bb5-819051accb8e" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="optionalHoliday-test-suite-optionalholidayapiFlowTest1" doc:id="731a612d-25e7-47d0-9aae-647e755c14f1" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fa1c7d35-ae25-46fe-ad81-8d9f5bb88a94" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e3f9b11f-c703-45a7-929a-48f07c38a534" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/gettingOptionalHolidays.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="84aaba57-9398-436f-ba68-e2a0a7667951" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9adf07ad-6430-444c-8400-0f78f037c103" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/gettingAttendances.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a134015c-bd0c-4d29-adb2-a9cd4a20a052" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="60e226cb-aacf-46f0-9d3e-f9ae46038506" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/noLeaves.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="b6139d31-11ab-4d2e-9e79-54918e985536">
+				<munit:payload value="#[readUrl('classpath://optionalHoliday/inputPayload.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to optionalholidayapiFlow" doc:id="f0f61085-5e07-4b7c-8f7a-b68f27620c65" name="optionalholidayapiFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="4a92a57c-2706-40fe-99ae-ad9a365a81f9" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="optionalHoliday-test-suite-optionalholidayapiFlowTest2" doc:id="cccd43d3-5eae-42ad-ac3a-0c0cc62d31e0" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2d2eb811-3918-433b-9ffa-a667c7ba2554" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e3f9b11f-c703-45a7-929a-48f07c38a534" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/payloadWhenNoOptionalHoliday.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="452ad481-d3cb-4153-9746-f07c49048bbe" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9adf07ad-6430-444c-8400-0f78f037c103" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/attendancesWhenNoOpt.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ff441aa1-7899-473f-8f78-f3920cae211a">
+				<munit:payload value="#[readUrl('classpath://optionalHoliday/inputPayload.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to optionalholidayapiFlow" doc:id="e2780779-87ca-4cb0-a2b3-10ad165fdc66" name="optionalholidayapiFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="e938eb1f-029b-419a-8fd0-16a45a3f07a4" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="optionalHoliday-test-suite-optionalholidayapiFlowTest3" doc:id="d757a8be-4b70-4d50-9605-6049596fa617" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="37ca95c3-c983-48a0-aa2d-2c6601cdeede" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e3f9b11f-c703-45a7-929a-48f07c38a534" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/gettingOptionalHolidays.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fd140147-6246-4a82-8564-eceec6823ecd" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9adf07ad-6430-444c-8400-0f78f037c103" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/attendanceWhenNoOptAndLoggedIn.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="945dc4e8-9235-4a68-85e1-0cfccece47d0">
+				<munit:payload value="#[readUrl('classpath://optionalHoliday/inputPayload.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to optionalholidayapiFlow" doc:id="cb595f5c-debc-4559-b861-bcd1a43b3a6b" name="optionalholidayapiFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="0003a5e0-3759-477e-a211-d401b9e8c946" expression="#[payload]" is="#[MunitTools::notNullValue()]" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="optionalHoliday-test-suite-optionalholidayapiFlowTest4" doc:id="692d3d1b-fa4f-42aa-a54a-0ec8e14649d2" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f59b714b-d66d-458d-9a36-30df9c4d020b" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e3f9b11f-c703-45a7-929a-48f07c38a534" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/notOpt.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="3fcbc717-4471-4124-b996-ed2cdf41cc18" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9adf07ad-6430-444c-8400-0f78f037c103" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://optionalHoliday/notOptThereIsCheckIn.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="099c18f1-c213-45cb-b85d-a776c2b77be7">
+				<munit:payload value="#[readUrl('classpath://optionalHoliday/inputPayload.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to optionalholidayapiFlow" doc:id="81afb5ac-f37f-437f-b897-3b7a66b529ed" name="optionalholidayapiFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="2c6259ce-5661-4b85-9a7d-7e472f4f27c2" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

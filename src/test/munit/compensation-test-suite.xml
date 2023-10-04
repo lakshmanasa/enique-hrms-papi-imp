@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="compensation-test-suite.xml" />
+	<munit:test name="compensation-test-suite-patch-compensation-flowTest" doc:id="908c1318-5164-4c8f-8256-c72c826fc045" description="Test">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ac398b34-37a1-40b2-ae18-1fc848f05516" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="059c5d9a-79ad-4171-b81d-88d481dbd0e7" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://compensation/get-response.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2e9f0800-5bf2-498e-a753-9a431da0ec78" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f599b33a-5f1b-4ba3-81b0-5bfac2042ab6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://compensation/patch-response.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="0293dd14-65e7-4b91-a3af-ffd7bb3610e0" >
+				<munit:payload value="#[readUrl('classpath://compensation/patch-request.dwl')]" />
+				<munit:attributes value="#[{uriParams:{id:'ES00001'}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to patch-compensation-flow" doc:id="5ac3d994-62d1-42a5-a8f0-62c759bac4c0" name="patch-compensation-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="4dd0d7ed-f4eb-4dd5-851a-80b3eb28082d" is="#[MunitTools::notNullValue()]" message="payload is null" expression="#[payload]"/>
+		</munit:validation>
+		</munit:test>
+	<munit:test name="compensation-test-suite-patch-compensation-NoRecord" doc:id="11e407c6-a5d7-449a-9efa-04663a23a2d4" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a454fa38-f259-4272-81f8-75663c638758" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="059c5d9a-79ad-4171-b81d-88d481dbd0e7" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[[]]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="744aadcc-e2fe-41d3-98e4-d7924b0691a6" >
+				<munit:payload value="#[readUrl('classpath://compensation/patch-request.dwl')]" />
+				<munit:attributes value='#[{uriParams:{id:"ES00001"}}]' />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="2c8ffb12-ffdb-489d-a491-b04c4734924f" >
+				<flow-ref doc:name="Flow-ref to patch-compensation-flow" doc:id="3a859de4-3242-49e3-9069-1fcd15c92415" name="patch-compensation-flow" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="9c50215a-3561-422c-9471-89621427a233" >
+						<set-payload value='#["continue"]' doc:name="Set Payload" doc:id="6e48a94c-f936-4b32-b47f-0c1df7a97d3d" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="057bdcb9-f77e-47e1-bc0c-29413a4e6860" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+
+
+
+</mule>

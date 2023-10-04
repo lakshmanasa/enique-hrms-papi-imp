@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="applyLeave-test-suite.xml" />
+	<munit:test name="applyLeave-test-suite-patch-leave-FlowTest" doc:id="f0cd4170-8da7-4ff8-8783-41448afa8cea" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c4fa5e27-5c01-4d86-9df2-a2a11a32ace7" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2a605891-6b9f-48e5-a6fd-6cfc1b604fed" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/get-response-applyleave.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f23fdcf7-51c9-4b34-9851-74b547249e6b" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="3bbb6257-d594-4dc2-b2e5-452b7fe756e2" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/for-response.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="b2c8dc66-5b83-41d4-9002-05c5a00830b0" >
+				<munit:payload value="#[readUrl('classpath://leave/patch-request.dwl')]" />
+				<munit:attributes value='#[{uriParams:{id:"ES00003"}}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to patch-leave-Flow" doc:id="1de30a54-d83f-4bca-a692-2687847c66ca" name="patch-leave-Flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="9eae92cd-8afd-490d-8bb8-a7db31ac02bc" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="applyLeave-test-suite-patch-leave-FlowTest-leaveAvailable-zero" doc:id="ca6b15dd-a136-461c-9d9b-f36eecf54600" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="04561f70-7f46-4758-b189-75d1bc3ecadd" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2a605891-6b9f-48e5-a6fd-6cfc1b604fed" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/leaveAvailable-zero.dwl')]" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="62166f58-83f1-463c-8830-e00dde963f95" >
+				<munit:payload value="#[readUrl('classpath://leave/patch-request.dwl')]" />
+				<munit:attributes value='#[{uriParams:{id:"ES00003"}}]' />
+			
+</munit:set-event>
+			<try doc:name="Try" doc:id="d6c687c4-d5d1-4dd7-8496-5acb67fb159a" >
+				<flow-ref doc:name="Flow-ref to patch-leave-Flow" doc:id="10699df9-8337-49c2-b722-552c98498f14" name="patch-leave-Flow" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="05f86f90-06da-4873-ae42-c10c5b9ec23a" >
+						<set-payload value="continue" doc:name="Set Payload" doc:id="1665e597-d003-4cb9-affa-01885b31511f" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		
+</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="7340e044-0134-4bac-9e16-97714293740f" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-patch-leave-FlowTest-Wrong-leaveType" doc:id="4f57ae89-922e-456c-a151-22ed20439a6c" description="Test">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="2cf17eca-e087-4518-b9fd-18eb2796ea82" >
+				<munit:payload value="#[readUrl('classpath://leave/wrong-leaveType.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to patch-leave-Flow" doc:id="66bf4921-89f5-4cb0-9d1d-5c37cf52f0e2" name="patch-leave-Flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="322f2c63-b2a8-48e7-ad66-cdeb8260a9c2" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-patch-leave-FlowTest-NOBODY" doc:id="bbea1e06-a6d2-4f35-bea7-836ecb4c6b9e" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="58f61b35-83d0-4fc7-b603-bf8c10c5109a" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2a605891-6b9f-48e5-a6fd-6cfc1b604fed" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[[]]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="ca4146e4-0485-47b9-8dbc-40c4a9f6ee36" >
+				<flow-ref doc:name="Flow-ref to patch-leave-Flow" doc:id="3c407dbe-9a2e-4df9-a569-7279c254e634" name="patch-leave-Flow" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8f282db5-a699-4133-8db7-dc53c707a466" >
+						<logger level="INFO" doc:name="Logger" doc:id="1bc17a52-4069-4b0c-b075-c46658faedb8" message="#[payload]"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="96c25a88-4adb-4cc1-b4ec-c8d7f33689c2" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-patch-leave-FlowTest-noIDPresent" doc:id="79378a2c-d898-4c3e-9ca1-964836783776" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f6573ee6-802d-4026-a276-91652302871e" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2a605891-6b9f-48e5-a6fd-6cfc1b604fed" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[[]]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:name="Set Event" doc:id="78323940-1b2a-4f7c-8054-7a17516a177a" >
+				<munit:payload value="#[readUrl('classpath://leave/patch-request.dwl')]" />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="57d0e4f0-0aac-4bf6-8f10-e6494a61e10f" >
+				<flow-ref doc:name="Flow-ref to patch-leave-Flow" doc:id="a0c71a96-7439-4663-9a88-0a1c5a195241" name="patch-leave-Flow" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="cbd9c86b-f966-4717-8500-e319a7c7bc2e" >
+						<logger level="INFO" doc:name="Logger" doc:id="0455db6c-07de-45b4-9f27-3beaafe2dbc7" message="#[payload]"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="7d3195f2-62b3-40e9-b723-e1280234eafa" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-post-leave-flowTest-onerequest" doc:id="b30b4633-9fc4-4f63-9b44-8e97c49bdc8c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1e25684c-b3e9-4221-802b-1b4a5aa65be2" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="200173ef-fb54-4b03-9a46-c85ed29dee4a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[null]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5202b496-824e-4069-a9ca-7c8c1aecb2d3" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="40cd29c4-80c3-4728-9641-16c91c817e94" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/for-response.dwl')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="71694afc-c711-441b-a084-1119409dbf52" >
+				<munit:payload value="#[readUrl('classpath://leave/post-request.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post-leave-flow" doc:id="778698ae-398e-4c4a-9587-346cf7aabc0c" name="post-leave-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="e5d5c671-2b8a-414e-9ece-7f6f3cce8e79" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-post-leave-flowTest-onerequest-choice" doc:id="79a5e15d-6761-4e1f-8feb-1c2637415929" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="cfb1be25-9d3d-4a93-b7f0-4e739c2bfabd" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="200173ef-fb54-4b03-9a46-c85ed29dee4a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/get-response-for-one-object.dwl')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="abef3b02-9591-45be-82f6-b54f81c773ca" >
+				<munit:payload value="#[readUrl('classpath://leave/post-request.dwl')]" />
+				<munit:variables >
+					<munit:variable key="actualpayload" value="#[readUrl('classpath://leave/post-request.dwl')]" />
+				</munit:variables>
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post-leave-flow" doc:id="eeba9198-feca-4285-966f-258b74032342" name="post-leave-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="ad9de73c-7144-4b9e-8765-59b64d5e12d6" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-post-leave-flowTest-threerequest" doc:id="fb3614cd-3aff-4c42-b1dd-8a0a0fce1895" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="69d22943-8f12-4a98-b64c-e4a35eea7902" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e3e38ed2-0e40-45fc-a1f0-75bb51b5a423" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[null]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="0506ff37-24ff-48b1-bc4a-8657fd23e885" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ffab3a05-51ce-4c32-8390-7c86c1653f44" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/for-response.dwl')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="9cbaaf3b-1146-4c63-aba9-1d77b6f99ed8" >
+				<munit:payload value="#[readUrl('classpath://leave/post-request-morethan-one-object.dwl')]" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post-leave-flow" doc:id="5368ff05-c435-4825-947a-223b8ee20db4" name="post-leave-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="06d1c594-3407-467e-9d9f-903657ab3ccf" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-post-leave-flowTest-threerequest-choice" doc:id="c3817d61-80be-4846-bd44-afab4a9e277c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="721e4a1a-bf13-40d8-94cc-e9eee5606974" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e3e38ed2-0e40-45fc-a1f0-75bb51b5a423" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/get-response-for-morethan-one-object.dwl')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="5214b6c5-2f3d-4f09-9355-a1b6ee15563b" >
+				<munit:payload value="#[readUrl('classpath://leave/post-request-morethan-one-object.dwl')]" />
+				<munit:variables >
+					<munit:variable key="actualpayload" value="#[readUrl('classpath://leave/post-request-morethan-one-object.dwl')]" />
+				</munit:variables>
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post-leave-flow" doc:id="90f69e07-e7a8-4591-a2cd-35aecfe1c2ec" name="post-leave-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="17459e6e-d4f2-47fe-9406-47f65843b1c5" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-patch-leave-FlowTest-Leavewithoutpay" doc:id="06df9bf8-790e-4660-88c7-25d6dce55d77" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="d5e28de8-5530-4200-829f-bad2b72de1ea" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2a605891-6b9f-48e5-a6fd-6cfc1b604fed" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/get-response-for-Leavewithoutpay.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9a431bce-8106-4a14-adf4-74ed286d18a5" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="3bbb6257-d594-4dc2-b2e5-452b7fe756e2" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/for-response.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="d4695e25-4cc3-4b3c-be1d-57d74448767c" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="4fe680a2-d591-496a-87c6-9e0226b59126" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://leave/compensation-leave.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="9e6fb8c5-6b0d-4b3a-9d9b-249aa3081243" >
+				<munit:payload value="#[readUrl('classpath://leave/patch-request.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to patch-leave-Flow" doc:id="97489153-7431-4f66-a8c0-3b7cdc65aa91" name="patch-leave-Flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="f587a84d-ed60-4d18-8b2a-03d52c6cbddb" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-post-leave-wrongleavetypefor-3-arrayofObjects" doc:id="91df347e-9e47-4f28-9b7e-d70f403fe95f" description="Test">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="4438053b-cc62-432a-ac15-0af386d74b5f" >
+				<munit:payload value="#[readUrl('classpath://leave/wrongbodyformorethanone-object.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post-leave-flow" doc:id="90b1ef55-28c9-4fe6-87d5-bb9a73c7e0f5" name="post-leave-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b5b006fa-86bb-44f1-a7fb-38952f8f656a" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applyLeave-test-suite-getById-leave-wrong-body-forone-object" doc:id="bf063cd8-33a7-4f11-852a-64815979778c" description="Test">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ac0b0f0b-cc5b-4879-ac6c-aa1f79ae26bf" >
+				<munit:payload value="#[readUrl('classpath://leave/wrongbodyforone-object.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to getById-leave-Flow1" doc:id="f953b492-1364-4cb2-a5e3-d81ddf95916b" name="post-leave-single-arrayofobject"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="8a2e7ab2-af42-481e-9ae0-879c19b5ef8e" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+
+
+</mule>

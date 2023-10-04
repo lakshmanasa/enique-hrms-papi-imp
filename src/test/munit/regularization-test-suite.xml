@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="regularization-test-suite.xml" />
+	<munit:test name="regularization-test-suite-attendanceRegularizationFlowTest" doc:id="eda89b6d-7860-400d-b746-ff5efbe018e0" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2c255c39-7582-4dd1-92a4-01accb5f072b" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="78644640-23e9-4434-a922-16541199ce80" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://regularization/get-response.dwl')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="3b55637c-f8e2-4b87-ac28-a8f51785f765" >
+				<munit:payload value="#[readUrl('classpath://regularization/payload.dwl')]" />
+				<munit:attributes value="#[{uriParams:{id: 'ES000027'},queryParams:{soqlWhereClause: &quot;employeeId__c='ES00001'&quot;}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to attendanceRegularizationFlow" doc:id="cf84ceab-e273-4749-9c0a-7ca71a8f8264" name="attendanceRegularizationFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="16cf1a9c-a474-411b-b3d2-4713ab98b8a4" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="regularization-test-suite-attendanceRegularizationFlowTest2" doc:id="6fa9f66f-91ad-4a2b-a193-071becd107db" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2a222d83-e799-4628-9b58-9b77b085098a" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="78644640-23e9-4434-a922-16541199ce80" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="78644640-23e9-4434-a922-16541199ce80" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://regularization/afterCheckIn.dwl')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="33619fc5-54b5-432c-8ca8-7a5bdf1ee606" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="21061c5d-8473-497a-9096-3a6ad6243866" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://regularization/upsert-responce.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="07f86b7e-c276-4877-92fc-6d4d57391365">
+				<munit:payload value="#[readUrl('classpath://regularization/payload.dwl')]" />
+				<munit:attributes value="#[{uriParams:{id: 'ES000027'},queryParams:{soqlWhereClause: &quot;employeeId__c='ES00001'&quot;}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to attendanceRegularizationFlow" doc:id="7be4a1e2-d1bf-498e-b1f3-282161a10902" name="attendanceRegularizationFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="1addf041-6a8a-4171-8d0a-220bbd85a88d" expression="#[payload]" is="#[MunitTools::notNullValue()]" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="regularization-test-suite-attendanceRegularizationFlowTest1" doc:id="55b2ba7c-e600-4c93-bf22-dbccb7ed08ad" description="Test">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="bde76fb6-e46d-4041-b5a4-9c910faee30a">
+				<munit:payload value="#[readUrl('classpath://regularization/notOpt.dwl')]" />
+				<munit:attributes value="#[{uriParams:{id: 'ES000027'},queryParams:{soqlWhereClause: &quot;employeeId__c='ES00001'&quot;}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to attendanceRegularizationFlow" doc:id="ed50b143-3bc3-400c-a695-dbf95f17c0d4" name="attendanceRegularizationFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="80104761-e81b-46af-a0f3-8bd82909a1f0" expression="#[payload]" is="#[MunitTools::notNullValue()]" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="regularization-test-suite-attendanceRegularizationFlowTest3" doc:id="3fa7f20e-3051-4148-a6c6-033fef137ee0" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="48fc192c-8745-4cc9-9989-65d4ad7f5fd0" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="78644640-23e9-4434-a922-16541199ce80" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="78644640-23e9-4434-a922-16541199ce80" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://regularization/inputPayload.dwl')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2f293b42-11b0-47a6-8dc1-483010288dc5" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ca3f0f43-b8e9-46e3-bbab-2eb5938eb455" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="ca3f0f43-b8e9-46e3-bbab-2eb5938eb455" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://regularization/upsert-responce.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a2679717-0c37-4b50-a837-6c6de0743ce4">
+				<munit:payload value="#[readUrl('classpath://regularization/payload.dwl')]" />
+				<munit:attributes value="#[{uriParams:{id: 'ES000027'},queryParams:{soqlWhereClause: &quot;employeeId__c='ES00001'&quot;}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to attendanceRegularizationFlow" doc:id="09bd6a55-8bec-40fb-9906-12ced2b6bd69" name="attendanceRegularizationFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="a0bf4a6b-4dac-47fa-b0a3-492da185e0c1" expression="#[payload]" is="#[MunitTools::notNullValue()]" />
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

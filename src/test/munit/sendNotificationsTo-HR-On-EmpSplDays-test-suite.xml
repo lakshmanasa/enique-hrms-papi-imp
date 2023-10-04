@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="sendNotificationsTo-HR-On-EmpSplDays-test-suite.xml" />
+	<munit:test name="sendNotificationsTo-HR-On-EmpSplDays-test-suite-get-employee-flowTest" doc:id="43f1ce7b-de97-441a-961d-d368467a1e91" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="804ae7f8-40e5-4875-b877-b79c0faeaae7" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="18d8b11c-e2ae-4b84-a53b-a829892c50de" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://sendNotification/for-response.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get-employee-flow" doc:id="3bbd0a59-139e-4e48-b964-261ad56e1d8c" name="get-employee-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="c4b4a13f-8b3a-4f43-ac83-d68d5e290253" message="payload is null" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="sendNotificationsTo-HR-On-EmpSplDays-test-suite-get-employee-flowTest1" doc:id="0569b199-ce55-4889-b00a-53116dca99af" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a331ff1b-f0f3-4314-bbae-d9df916c6024" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="18d8b11c-e2ae-4b84-a53b-a829892c50de" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://sendNotification/positive-response.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get-employee-flow" doc:id="70f19309-82dd-43f1-8a15-351db33d0500" name="get-employee-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="4951e555-fc79-40f3-a0f8-035c8250bdc7" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="sendNotificationsTo-HR-On-EmpSplDays-test-suite-birthdayFlow1Test" doc:id="094596eb-6627-4938-8e03-f4bdc553921c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8b78c169-e89c-40dd-917b-61e560b5919b" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="18d8b11c-e2ae-4b84-a53b-a829892c50de" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://sendNotification/for-response.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="da1ff9d7-ef49-4625-a778-a30292bd6a2a" >
+				<munit:payload value="#[readUrl('classpath://sendNotification/for-response.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to birthdayFlow1" doc:id="08e2788a-e91b-4cf9-bb0f-134de29a05a6" name="birthdayFlow1"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="7ea9a72c-7af7-4ab0-a298-2906a7363fe2" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="sendNotificationsTo-HR-On-EmpSplDays-test-suite-birthdayFlow1Test1" doc:id="f9a31bec-c339-4726-8a5d-eeb0c8c667a7" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="283e35b0-ee93-4269-ab34-7bcd77f4803d" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="18d8b11c-e2ae-4b84-a53b-a829892c50de" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://sendNotification/positive-response.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="e7d0ace1-e069-4ef4-a6d5-4d5e0a3c9859" >
+				<munit:payload value="#[readUrl('classpath://sendNotification/positive-response.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to birthdayFlow1" doc:id="66a2923a-19d1-4399-8e2d-8058d8b6e126" name="birthdayFlow1"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="d5d00967-2567-4202-b2ba-92613d65aaf9" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

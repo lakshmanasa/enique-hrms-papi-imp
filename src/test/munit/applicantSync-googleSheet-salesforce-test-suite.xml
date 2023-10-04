@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="applicantSync-googleSheet-salesforce-test-suite.xml" />
+	<munit:test name="applicantSync-googleSheet-salesforce-test-suite-post-email-flowTest" doc:id="407621d1-13fa-4b06-ada9-bf0bd2ea97f4" description="Test">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="784f6e1f-2416-4f4d-9ad7-bafe179ceb8a" >
+				<munit:payload value="#[readUrl('classpath://gsheets/emailPayload.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post-email-flow" doc:id="7155f3c8-07c6-4b0d-93ac-62fb3b5f6d59" name="post-email-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="ae88820f-65a3-481d-b21c-f097dca7fb9b" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applicantSync-googleSheet-salesforce-test-suite-on-newRow-inGoogleSheet-flowTest" doc:id="b7f5b7df-ede3-4591-8f3b-b90afd53be22" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="57ee4329-36f9-4654-8764-8be4f1278e9b" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="8f6a3626-0b09-412b-a742-6652cce1290c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://gsheets/onNewRow-httpRequest.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="2c1084f7-03d0-4e7d-beed-4da443e554de" >
+				<munit:payload value="#[readUrl('classpath://gsheets/onNewRow.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to on-newRow-inGoogleSheet-flow" doc:id="e1696fdc-925c-4576-bedf-005ff0b16837" name="on-newRow-inGoogleSheet-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="0ee590e8-dd42-4354-9116-cfb2889e0c58" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applicantSync-googleSheet-salesforce-test-suite-on-updateRow-inGoogleSheet-flowTest" doc:id="bffe29a8-4bea-4aed-958e-34bc0eef8246" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="98c55e5d-69a6-4ba2-a069-55a8a682a853" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e58a3dc5-a158-44d8-b352-78d60c943066" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://gsheets/onNewRow-httpRequest.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="3c317966-7f63-42e4-b836-0eee797f557a" >
+				<munit:payload value="#[readUrl('classpath://gsheets/onNewRow.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to on-updateRow-inGoogleSheet-flow" doc:id="4330db67-a37b-4dbc-b069-6da0f5dbc53c" name="on-updateRow-inGoogleSheet-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="e13779ca-a857-4d37-8011-978935bd8d06" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="applicantSync-googleSheet-salesforce-test-suite-get-details-from-googleSheet-flowTest" doc:id="af4e05fa-95f3-45a6-8b15-e95a2ce23928" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="4a325108-2a10-436b-a3ad-c766d121a183" processor="google-sheets:get-spreadsheets-values-by-spreadsheet-id-range">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="378efd6c-1ae8-4c41-a023-97570768a1f0" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://gsheets/getPayload.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get-details-from-googleSheet-flow" doc:id="572d0f11-d3b5-4351-a19b-2a4bc6ece799" name="get-details-from-googleSheet-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="fddb2de5-986e-46b5-a805-d65d7bdf1d24" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

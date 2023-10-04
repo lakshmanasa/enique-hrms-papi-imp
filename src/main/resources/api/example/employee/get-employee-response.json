@@ -1,0 +1,21 @@
+[{
+   "id": "1",
+   "employeeId": "ES00001",
+   "employeeName": "Sampath",
+   "dateOfJoining": "28-January",
+   "nickName": "Sam",
+   "gender": "Male",
+   "country": "India",
+   "state": "Telangana",
+   "language": "Telugu",
+   "emailId": "sampathreddyjr@gmail.com",
+   "mobileNumber": "9133973973",
+   "deptId": "12",
+   "managerId": "123",
+   "yearOfJoining": "2012",
+   "dateOfBirth": "10-December",
+   "currentLocation": "Hyderabad",
+   "experience": "2",
+   "highestQualification": "M-Tech"
+   
+   }]

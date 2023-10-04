@@ -1,0 +1,27 @@
+[
+{
+  "applicantId": "1", 
+  "applicantName": "Sam",  
+  "contactNumber": "9133973943",
+  "currentLocation": "hyd",
+  "emailId": "sam@gmail.com",
+  "dateOfBirth": "sam",
+  "experience": "3",
+  "mobileNumber": "9133",
+  "employeeId": "29",
+  "dateOfJoining": "14th August",
+  "gender": "Male",
+  "country": "India",
+  "state": "telanagana",
+  "managerId": "59",
+  "deptId": "89",
+  "nickName": "Vas",
+  "language": "telugu",
+  "yearOfJoining": "2020"
+
+
+
+
+
+
+}]

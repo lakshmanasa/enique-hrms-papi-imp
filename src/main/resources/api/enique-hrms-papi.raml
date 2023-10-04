@@ -1,0 +1,168 @@
+#%RAML 1.0
+title: enique-hrms-papi
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/sources/vcs/projects/4d031359-a699-47e2-a734-e5cbef581fd7/ #
+securitySchemes:
+  client: !include /security/securityScheme.raml
+securedBy:
+  - client
+
+types:
+  applicant: !include datatype/dataType.raml
+  leave: !include datatype/leavesdataType.raml
+  formerEmployee: !include datatype/formerEmployee-dataType.raml
+  employee: !include datatype/employeedataType.raml
+  employeerecords: !include datatype/employeedataType.raml
+  submitattendance: !include datatype/attendanceDataType.raml
+  optionalHoliday: !include datatype/optionalHolidaydataType.raml
+  compensation: !include datatype/compensationdataType.raml
+  attendance : !include datatype/attendanceDataType.raml
+  patchLeave: !include datatype/patchLeave-dataType.raml
+/v1:
+ /papi:
+  /applicant:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: applicant
+              example: !include example/applicant.raml
+    post:
+      body:
+        application/json:
+          type: applicant
+          example: !include example/applicant.raml
+      responses:
+        201:
+          body:
+                application/json:
+                      example:
+                        {"message": "inserted Successfully"}    
+    patch:
+      body:
+         application/json:
+          type: applicant
+          example: !include example/applicant.raml
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                 { "message" : "updated successfully"}
+  /postLeave:                          
+      post: 
+       body:
+        application/json:
+          type: leave[]
+          example: !include example/leaves/create-leave-request.json
+       responses:
+        201:
+          body:
+            application/json:
+              example: !include example/leaves/post-leave-response.json
+  /applyLeave:
+      /{id}:
+        patch: 
+         body:
+          application/json:
+           type: patchLeave[]
+           example: !include example/leaves/patch-leave-request.json
+         responses:
+          201:
+           body:
+            application/json:
+              example: !include example/leaves/patch-leave-response.json
+  /employee:
+      get:
+        queryParameters:
+          soqlWhereClause:
+            required: false
+        responses:
+          200:
+            body:
+              application/json:
+                type: employee[]
+                example: !include example/employee/get-employee-response.json
+  /formerEmployee:
+      post:
+        body:
+          application/json:
+            type: formerEmployee[]
+            example: !include example/formerEmployee/create-formerEmployee.json
+        responses:
+          201:
+            body:
+              application/json:
+                example: !include example/formerEmployee/post-formerEmployee-response.json
+  /sendNotification:
+    post:
+      responses:
+       200:
+        body:
+         application/json:
+          example: !include example/sendNotification/post-sendnotification-resp.json
+  /optionalHoliday:
+     post:
+      body:
+       application/json:
+        type: optionalHoliday[]
+        example: !include example/optionalHoliday/create-optional.json
+      responses:
+       201:
+         body:
+           application/json:
+             example: !include example/optionalHoliday/post-optional.json
+  /submitattendance:
+    post:
+      body:
+         application/json:
+          type: submitattendance[]
+          example: !include example/timeLog/createexample.json
+      responses:
+       201:
+          body:
+                application/json:
+                      example:
+                               !include example/timeLog/postexample.json
+  /employeerecord:
+      post:
+       body:
+        application/json:
+          type: employeerecords[]
+          example: !include example/employeerecords/createexample.json
+       responses:
+        201:
+         body:
+          application/json:
+            example: !include example/employeerecords/postexample.json
+          
+  /compensation:
+   /{id}:
+     patch:
+        body:
+          application/json:
+            type: compensation[]
+            example: !include example/compensation/patch-compensation-request.json
+        responses:
+          201:
+            body:
+              application/json:
+                example: !include example/compensation/patch-compensation-response.json
+                
+  /regularization:
+    /{id}:
+        patch: 
+         body:
+          application/json:
+           example: !include example/get.json
+         responses:
+          201:
+           body:
+            application/json:
+              example: !include example/post-optional.json
+
+                      
+
+                
+                      
+                

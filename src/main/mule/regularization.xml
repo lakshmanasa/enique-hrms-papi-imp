@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="attendanceRegularizationFlow" doc:id="5ac3f0c4-37af-40b2-b6bb-4dd4962c0d0f" >
+		<ee:transform doc:name="Checking is total login time is less than 9hrs or not" doc:id="48d9c0e2-eac9-492a-9931-2c26c36e487f" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="condition" ><![CDATA[%dw 2.0
+output application/json
+var a = payload.checkInTime as Time
+var b = payload.checkOutTime as Time
+var c = abs(a.minutes - b.minutes)
+var d = abs(a.seconds - b.seconds)
+var z = abs(a.hour - b.hour)
+var k = ("08:59:59" as Time)
+var g = if(c <= 9)
+{
+    "Minutes": 0 as String ++ c as String
+}
+  else
+  {
+      "Minutes": c
+  }
+var e = if(d <= 9)
+{
+    "Seconds": 0 as String ++ d as String
+}
+  else
+  {
+      "Seconds": d
+  }
+var h = if(z <= 9)
+{
+    "Hours": 0 as String ++ z as String
+}
+  else
+  {
+      "Hours": z
+  }
+var f =  (h.Hours ++ ":" ++ g.Minutes ++ ":" ++ e.Seconds) as Time
+var s = if(f <= k )
+{
+    "Condition": "true"
+}
+  else
+  {
+      "Condition": "false"
+  }
+---
+s.Condition as String]]></ee:set-variable>
+				<ee:set-variable variableName="totalLoginTime" ><![CDATA[%dw 2.0
+output application/json
+var a = payload.checkInTime as Time
+var b = payload.checkOutTime as Time
+var c = abs(a.minutes - b.minutes)
+var d = abs(a.seconds - b.seconds)
+var z = abs(a.hour - b.hour)
+var k = ("08:59:59" as Time)
+var g = if(c <= 9)
+{
+    "Minutes": 0 as String ++ c as String
+}
+  else
+  {
+      "Minutes": c
+  }
+var e = if(d <= 9)
+{
+    "Seconds": 0 as String ++ d as String
+}
+  else
+  {
+      "Seconds": d
+  }
+var h = if(z <= 9)
+{
+    "Hours": 0 as String ++ z as String
+}
+  else
+  {
+      "Hours": z
+  }
+var f =  (h.Hours ++ ":" ++ g.Minutes ++ ":" ++ e.Seconds)
+---
+f]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="f9205c46-908b-445a-a2de-bd24b62475a6" >
+			<when expression='#[(vars.condition == "false")]'>
+				<ee:transform doc:name="Sending path,method as varaibles" doc:id="29a617d6-303a-4224-b576-186de3b93aee">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[Mule::p('system.path.timelog.getAttendance')]]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA['GET']]></ee:set-variable>
+				<ee:set-variable variableName="actualPayload"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="uriParams"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.uriParams
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<ee:transform doc:name="QueryParams" doc:id="569b1e2b-0c7b-4421-af7e-15b45d6a4621">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="queryParams"><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	"soqlWhereClause" : attributes.queryParams.soqlWhereClause default {}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="Flow Reference" doc:id="78644640-23e9-4434-a922-16541199ce80" name="salesforce-sys-api-request" />
+				<ee:transform doc:name="Mapping payload" doc:id="bda2cbfa-4548-4a23-8759-30e46ba4c6ab">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var a = payload
+var b = if(a == null)
+{
+    "sam": null
+}
+  else
+  {
+      "sam": (a reduce($$++$$))
+  }
+---
+b.sam]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="employeeId"><![CDATA[%dw 2.0
+output application/json
+var a = payload.employeeId__c
+---
+(a reduce($$++$$))]]></ee:set-variable>
+				<ee:set-variable variableName="employeeName"><![CDATA[%dw 2.0
+output application/json
+var a = payload.Name
+---
+(a reduce($$++$$))]]></ee:set-variable>
+				<ee:set-variable variableName="payloadEmpty"><![CDATA[%dw 2.0
+output application/json
+var a = isEmpty(payload)
+---
+(a as String)]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<ee:transform doc:name="Checkin and checkout as variables" doc:id="c988b92e-e474-46b6-bcc1-ab5fded42bf1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="checkIn"><![CDATA[%dw 2.0
+output application/json
+var a = isEmpty(payload.checkInTime__c)
+---
+(a as String)]]></ee:set-variable>
+				<ee:set-variable variableName="checkOut"><![CDATA[%dw 2.0
+output application/json
+var a = isEmpty(payload.checkOutTime__c)
+---
+(a as String)]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<choice doc:name="Choice" doc:id="97966302-8682-4614-8aae-223521fe4595">
+			<when expression='#[(vars.checkIn == "false") and (vars.checkOut == "false") and (payload.totalHoursLogged__c &lt; ("09:00:00") as Time)]'>
+				<ee:transform doc:name="Transform Message" doc:id="0bf755de-24cd-4741-81a9-7a94a7c9efb2">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+							</ee:message>
+							<ee:variables>
+								<ee:set-variable variableName="method"><![CDATA['PATCH']]></ee:set-variable>
+								<ee:set-variable variableName="path"><![CDATA[Mule::p('system.path.timelog.attendanceDetails')]]></ee:set-variable>
+						<ee:set-variable variableName="mappedTotalTime"><![CDATA[%dw 2.0
+output application/json
+var a = payload.checkInTime__c as Time
+var b = payload.checkOutTime__c as Time
+var c = abs(a.minutes - b.minutes)
+var d = abs(a.seconds - b.seconds)
+var z = abs(a.hour - b.hour)
+var g = if(c <= 9)
+{
+    "Minutes": 0 as String ++ c as String
+}
+  else
+  {
+      "Minutes": c
+  }
+var e = if(d <= 9)
+{
+    "Seconds": 0 as String ++ d as String
+}
+  else
+  {
+      "Seconds": d
+  }
+var h = if(z <= 9)
+{
+    "Hours": 0 as String ++ z as String
+}
+  else
+  {
+      "Hours": z
+  }
+---
+h.Hours ++ ":" ++ g.Minutes ++ ":" ++ e.Seconds
+
+]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+				<ee:transform doc:name="Mapping values to upsert" doc:id="c869d814-025d-4534-afe8-9de6be462a6b">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+ [{
+	checkInTime: vars.actualPayload.checkInTime,
+	checkOutTime: vars.actualPayload.checkOutTime,
+	date: vars.actualPayload.date,
+	employeeId: vars.actualPayload.employeeId,
+	totalHoursLogged: vars.mappedTotalTime,
+}]]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+				<flow-ref doc:name="Flow Reference to system layer" doc:id="ca3f0f43-b8e9-46e3-bbab-2eb5938eb455" name="salesforce-sys-api-request" />
+				<ee:transform doc:name="Final Output" doc:id="754cffee-9221-4202-a24f-1462e65b2b7f">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "Regularization request successfully submitted for " ++ vars.actualPayload.Name as String ++ ", " ++ vars.actualPayload.employeeId as String,
+	"Date to be regularized ": vars.actualPayload.date
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[((vars.checkIn == "false") and (vars.checkOut == "true")) or ((vars.payloadEmpty == "true") and (vars.checkIn == "true") and (vars.checkOut == "true"))]'>
+				<ee:transform doc:name="Method,path as variables" doc:id="bdeec20d-95f7-4aed-a162-ba8671efaa2f">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="mappedTotalTime"><![CDATA[%dw 2.0
+output application/json
+var a = vars.actualPayload.checkInTime as Time
+var b = vars.actualPayload.checkOutTime as Time
+var c = abs(a.minutes - b.minutes)
+var d = abs(a.seconds - b.seconds)
+var z = abs(a.hour - b.hour)
+var g = if(c <= 9)
+{
+    "Minutes": 0 as String ++ c as String
+}
+  else
+  {
+      "Minutes": c
+  }
+var e = if(d <= 9)
+{
+    "Seconds": 0 as String ++ d as String
+}
+  else
+  {
+      "Seconds": d
+  }
+var h = if(z <= 9)
+{
+    "Hours": 0 as String ++ z as String
+}
+  else
+  {
+      "Hours": z
+  }
+---
+h.Hours ++ ":" ++ g.Minutes ++ ":" ++ e.Seconds
+
+]]></ee:set-variable>
+						<ee:set-variable variableName="method"><![CDATA['PATCH']]></ee:set-variable>
+						<ee:set-variable variableName="path"><![CDATA[Mule::p('system.path.timelog.attendanceDetails')]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Mapping values to upsert" doc:id="0c8d4316-cae2-4c18-a574-759e790a5728">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+ [{
+	checkInTime: vars.actualPayload.checkInTime,
+	checkOutTime: vars.actualPayload.checkOutTime,
+	date: vars.actualPayload.date,
+	employeeId: vars.actualPayload.employeeId,
+	totalHoursLogged: vars.mappedTotalTime,
+}]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference to system layer" doc:id="21061c5d-8473-497a-9096-3a6ad6243866" name="salesforce-sys-api-request" />
+				<ee:transform doc:name="Final Output" doc:id="66dfe762-c802-4c7b-ae21-ee662c600324">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "Regularization request successfully submitted for " ++ vars.actualPayload.Name as String ++ ", " ++ vars.actualPayload.employeeId as String,
+	"Date to be regularized ": vars.actualPayload.date
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Output" doc:id="e2d6d551-b265-4175-8e3b-c1c8c4030737">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "Login Hours are more than 9hrs for " ++ vars.actualPayload.Name as String ++ ", " ++ vars.actualPayload.employeeId as String
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+			</otherwise>
+		</choice>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="7c45c459-1d5d-4ece-a124-45d112bedec5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "Total Login Time should be more than 9hrs.Please Review checkIn,checkOut Time and try again.",
+	"checkInTime": payload.checkInTime,
+	"checkOutTime": payload.checkOutTime,
+	"total login time": vars.totalLoginTime
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<error-handler ref="globalErrorHandlerError_Handler" />
+	</flow>
+</mule>

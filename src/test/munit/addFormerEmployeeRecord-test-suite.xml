@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="addFormerEmployeeRecord-test-suite.xml" />
+	<munit:test name="addFormerEmployeeRecord-test-suite-post-formerEmployee-flowTest" doc:id="627d1611-1992-40cf-9447-86d01574e158" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b0a26098-9e3f-425d-976d-0a2a06294c3b" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d3576196-6152-431f-8467-bddaecb7a4dc" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="employeeoutput" value="#[readUrl('classpath://addFormerEmployee/employee.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="dc937b10-8695-46fd-a3fa-6fc2d07c8cb6" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2f7d04fd-9566-4478-8193-b92dc849ba80" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="personaldetailsoutput" value="#[readUrl('classpath://addFormerEmployee/personalDetails.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b6f3a6ff-d800-41e6-bfa1-8486ee81807c" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="a29d81c2-5780-401e-b316-ce667dc79837" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="projectoutput" value="#[readUrl('classpath://addFormerEmployee/project.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fa0eb39c-3b01-4ba0-bc73-f03bdf5fde10" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="6a3f3e10-b3bc-431e-8864-8d44404b57e3" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="formerEmployeeoutput" value="#[readUrl('classpath://addFormerEmployee/for-response.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="93b878be-1e6b-4f9d-bd48-2f680bb8bc32" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="50ee7ca1-f89e-46da-a18f-c1f359d7a5b4" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="project" value="#[readUrl('classpath://addFormerEmployee/for-response.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="32a3065e-cc1e-427e-be8a-2a02efe20910" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d88770c4-af1f-4a90-a210-44b6e0fd1aa1" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="personalDetails" value="#[readUrl('classpath://addFormerEmployee/for-response.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9a010b15-a526-4617-bbf7-eb387b2cc094" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2d150cc3-1668-40fa-860b-19b65e8ef518" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="department" value="#[readUrl('classpath://addFormerEmployee/for-response.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c68bdcb6-db38-481f-93ed-21278c6cadc5" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="5486665c-15e2-4942-8df0-e7453e7581fd" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="employee" value="#[readUrl('classpath://addFormerEmployee/for-response.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="512fd549-793d-4d19-aa98-1d95fb3555c4" >
+				<munit:payload value='#[[&#10;    {&#10;        "employeeId": "ES00301"&#10;    }&#10;]]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post-formerEmployee-flow" doc:id="c55f28cf-6788-4291-a9b5-65491475d06b" name="post-formerEmployee-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="e8b70cd6-292a-45e0-b62b-6078761889f1" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="addFormerEmployeeRecord-test-suite-post-formerEmployee-flowTest-1" doc:id="b214df90-7108-41fa-9f4a-8f7bf271db6e" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="29986ff9-07ff-44d9-bcca-2c22299cc97a" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d3576196-6152-431f-8467-bddaecb7a4dc" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="employeeoutput" value="#[readUrl('classpath://addFormerEmployee/employee.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b2a4f08c-5223-4108-ae71-a8561970e1d0" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2f7d04fd-9566-4478-8193-b92dc849ba80" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="personaldetailsoutput" value="#[readUrl('classpath://addFormerEmployee/personalDetails.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="92ab1385-f446-4fde-a583-0f7ff2d60837" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="a29d81c2-5780-401e-b316-ce667dc79837" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="projectoutput" value="#[readUrl('classpath://addFormerEmployee/project.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1e549fa7-46c4-43da-b7a7-53ba1a3b0ed6" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="6a3f3e10-b3bc-431e-8864-8d44404b57e3" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="formerEmployeeoutput" value="#[readUrl('classpath://addFormerEmployee/negativeresponse.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		
+</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a0d4b21d-b8d3-41be-aa87-f795fa0fc9c8" >
+				<munit:payload value='#[[
+&#10;    {
+&#10;        "employeeId": "ES00301"
+&#10;    }
+&#10;]]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post-formerEmployee-flow" doc:id="827a68f4-988f-4ce2-a1df-ba47e95a76a6" name="post-formerEmployee-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="2f1b8bdd-6229-4406-8002-e159e1c42e33" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="addFormerEmployeeRecord-test-suite-post-formerEmployee-NoRecord" doc:id="553a7133-01be-4e6d-986d-a8443a4730df" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c7207c1b-aaef-4c0c-b778-6cbc7161e9e3" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d3576196-6152-431f-8467-bddaecb7a4dc" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="employeeoutput" value="#[[]]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="8f00fca0-7e9a-4806-a47e-24e6ce4decf7" >
+				<munit:payload value='#[[{"employeeId": "ES00301"}]]' />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="59671aa4-f84b-4e2a-92d9-894b1202761a" >
+				<flow-ref doc:name="Flow-ref to post-formerEmployee-flow" doc:id="a6596044-fd50-43a9-b340-a3aa20466f69" name="post-formerEmployee-flow" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1bb7cbf2-50ed-4c58-ab4a-54772a4aeb3d" >
+						<set-payload value='#["continue"]' doc:name="Set Payload" doc:id="3465eb0c-748b-498c-9a2d-8b35574b58da" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="ba360a5d-b777-4652-8ea0-90ebfb8b8c56" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

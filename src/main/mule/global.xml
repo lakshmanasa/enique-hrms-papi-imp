@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:google-sheets="http://www.mulesoft.org/schema/mule/google-sheets" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/google-sheets http://www.mulesoft.org/schema/mule/google-sheets/current/mule-google-sheets.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<http:listener-config name="enique-hrms-papi-httpListenerConfig" doc:name="HTTP Listener config" doc:id="e501c9da-9961-4ca7-bc7c-9281422491d8" >
+		<http:listener-connection host="${http.host}" port="${p.port}">
+		</http:listener-connection>
+	</http:listener-config>
+	<google-sheets:config name="Google_Sheets_Config" doc:name="Google Sheets Config" doc:id="8eedb73b-9441-4d40-b5f9-f9a76d76414b" >
+		<google-sheets:oauth-2-0-connection >
+			<google-sheets:oauth-authorization-code consumerKey="${secure::gsheets.clientid}" consumerSecret="${secure::gsheets.clientsecret}"/>
+			<google-sheets:oauth-callback-config listenerConfig="enique-hrms-papi-httpListenerConfig" callbackPath="/callback" authorizePath="/login" />
+		</google-sheets:oauth-2-0-connection>
+	</google-sheets:config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="91cdd499-3d6f-484e-99ec-77fcfbc81dc5" >
+		<email:smtp-connection host="${send1.host}" user="${send1.username}" password="${secure::send1.password}" port="${send1.port}" connectionTimeout="50">
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<email:imap-config name="Email_IMAP" doc:name="Email IMAP" doc:id="da8238ed-77c3-471f-aef0-79b778ecd5c4" >
+		<email:imaps-connection host="${onnewmessage.host}" user="${onnewmessage.username}" password="${secure::onnewmessage.password}" port="${onnewmessage.port}" connectionTimeout="50">
+			<tls:context >
+				<tls:trust-store insecure="true" />
+			</tls:context>
+			<email:properties >
+				<email:property key="mail.imap.ssl.enable" value="true" />
+			</email:properties>
+		</email:imaps-connection>
+	</email:imap-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="50aac5e4-5a8c-40b4-8b34-48474ce37ef0" />
+	<apikit:config outboundHeadersMapName="outboundHeadersMapName" httpStatusVarName="httpStatus" doc:name="Router" doc:id="100796a2-f32a-4a70-96e1-2f1086fabf43" name="enique-hrms-papi-config" api="enique-hrms-papi.raml" >
+	<apikit:flow-mappings>
+			<apikit:flow-mapping resource="/v1/papi/applicant" action="get" flow-ref="get-details-from-googleSheet-flow" />
+			<apikit:flow-mapping resource="/v1/papi/applicant" action="post" flow-ref="post-email-flow" />
+		    <apikit:flow-mapping resource="/v1/papi/applyLeave/{id}" action="patch" flow-ref="patch-leave-Flow" />
+			<apikit:flow-mapping resource="/v1/papi/postLeave" action="post" flow-ref="post-leave-flow" />
+			<apikit:flow-mapping resource="/v1/papi/sendNotification" action="post" flow-ref="get-employee-flow" />
+			<apikit:flow-mapping resource="/v1/papi/formerEmployee" action="post" flow-ref="post-formerEmployee-flow" />
+		    <apikit:flow-mapping resource="/v1/papi/submitattendance" action="post" flow-ref="timeLogPostFlow" />
+			<apikit:flow-mapping resource="/v1/papi/employeerecord" action="post" flow-ref="employeeRecordsFlow" />
+			<apikit:flow-mapping resource="/v1/papi/optionalHoliday" action="post" flow-ref="optionalholidayapiFlow" />
+			<apikit:flow-mapping resource="/v1/papi/compensation/{id}" action="patch" flow-ref="patch-compensation-flow" />
+			<apikit:flow-mapping resource="/v1/papi/regularization/{id}" action="patch" flow-ref="attendanceRegularizationFlow" />
+		</apikit:flow-mappings>
+	</apikit:config>
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="e3e162b9-5917-4b75-9569-e0e37940b3c9" file="enique-hrms-papi-cloud.yaml" key="hrmsproject12345" />
+	<configuration-properties doc:name="Configuration properties" doc:id="7a87e35b-5bb8-4867-ad8b-d31df41cd159" file="enique-hrms-papi-cloud.yaml" />
+	<configuration doc:name="Configuration" doc:id="12a24501-77f4-4bf6-8f5f-cbaa4b138c30" defaultErrorHandler-ref="globalErrorHandlerError_Handler" />
+</mule>

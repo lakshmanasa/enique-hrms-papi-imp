@@ -1,0 +1,418 @@
+{
+	"info": {
+		"_postman_id": "5f029e0a-f055-49ea-8a72-7cb3e96b0c67",
+		"name": "enique-hrms-papi Copy 2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "applicant",
+			"item": [
+				{
+					"name": "getApplicantsFromGoogleSheet",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/applicant",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"applicant"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "postApplicantToGoogleSheet",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"applicantId\": \"ES00026\",\r\n    \"applicantName\": \"Suresh\",\r\n    \"dateOfApplication\": \"10-12-2021\",\r\n    \"jobId\": \"05\",\r\n    \"applicantType\": \"experience\",\r\n    \"locationPreference1\": \"hyderabad\",\r\n    \"locationPreference2\": \"chennai\",\r\n    \"locationPreference3\": \"bengaluru\",\r\n    \"contactNumber\": \"1088003010\",\r\n    \"emailId\": \"suresh@gmail.com\",\r\n    \"currentLocation\": \"hyderabad\",\r\n    \"qualification\": \"B-tech\",\r\n    \"collegeName\": \"NIT\",\r\n    \"passOutYear\": \"2018\",\r\n    \"programmingSkills\": \"java,python\",\r\n    \"experience\": \"3\",\r\n    \"noticePeriod\": \"3months\",\r\n    \"openForRelocation\": \"yes\",\r\n    \"currentSalary\": \"80000\",\r\n    \"expectedSalary\": \"100000\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/applicant",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"applicant"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "leaves",
+			"item": [
+				{
+					"name": "postNewLeavebyType",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[{\r\n\"employeeId\": \"ES00018\",\r\n\"leaveAvailable\": \"6\",\r\n\"leaveBooked\": \"0\",\r\n\"leaveid\": \"52\",\r\n\"leaveType\": \"Privileged\",\r\n\"employeeName\": \"Ishwari\",\r\n\"totalLeaves\": \"6\"\r\n}]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/postLeave",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"postLeave"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "postNewLeavesasArray",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[{\r\n\"employeeId\": \"ES00017\",\r\n\"leaveAvailable\": \"6\",\r\n\"leaveBooked\": \"0\",\r\n\"leaveid\": \"50\",\r\n\"leaveType\": \"Sick\",\r\n\"employeeName\": \"Nagendra\",\r\n\"totalLeaves\": \"6\"\r\n},\r\n{\r\n\"employeeId\": \"ES00017\",\r\n\"leaveAvailable\": \"6\",\r\n\"leaveBooked\": \"0\",\r\n\"leaveid\": \"51\",\r\n\"leaveType\": \"Casual\",\r\n\"employeeName\": \"Nagendra\",\r\n\"totalLeaves\": \"6\"\r\n}]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/postLeave",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"postLeave"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "applyLeave",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[{\r\n  \"employeeId\": \"ES00003\",\r\n  \"leaveType\": \"Casual\",\r\n  \"no.ofLeaves\": \"12\"\r\n  }]\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/applyLeave/ES00003",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"applyLeave",
+								"ES00003"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "formerEmployee",
+			"item": [
+				{
+					"name": "postRecordToFormerEmployee",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"employeeId\": \"ES00024\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/formerEmployee",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"formerEmployee"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "optionalHoliday",
+			"item": [
+				{
+					"name": "availOptionalHoliday",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n{  \"employeeName\": \"Sai\",\r\n   \"employeeId\": \"ES000006\",\r\n  \"Ramnavmi\": \"22nd june\",\r\n  \"Eid\": \"25th may\",\r\n  \"Christmas_Eve\": \"25 december\",\r\n  \"New_years_Eve\": \"30 dec\",\r\n  \"Lohri\": \"13th jan\",\r\n  \"id\": \"24\"\r\n\r\n}\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/optionalHoliday",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"optionalHoliday"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "timeLog API",
+			"item": [
+				{
+					"name": "submitAttendance(checkIn/checkOut)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  {\r\n  \"employeeName\": \"Sampath\",\r\n  \"employeeId\": \"ES000027\"\r\n  }\r\n] ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/submitattendance?soqlWhereClause=employeeId__c='ES000027'",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"submitattendance"
+							],
+							"query": [
+								{
+									"key": "soqlWhereClause",
+									"value": "employeeId__c='ES000027'"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "applicantRecordsToEmployeeRecords",
+			"item": [
+				{
+					"name": "applicantRecordsToEmployeeRecords",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n{\r\n  \"applicantId\": \"1\", \r\n  \"applicantName\": \"Sam\",  \r\n  \"contactNumber\": \"9133973943\",\r\n  \"currentLocation\": \"hyd\",\r\n  \"emailId\": \"sam@gmail.com\",\r\n  \"dateOfBirth\": \"sam\",\r\n  \"experience\": \"3\",\r\n  \"mobileNumber\": \"9133\",\r\n  \"employeeId\": \"29\",\r\n  \"dateOfJoining\": \"14th August\",\r\n  \"gender\": \"Male\",\r\n  \"country\": \"India\",\r\n  \"state\": \"telanagana\",\r\n  \"managerId\": \"59\",\r\n  \"deptId\": \"89\",\r\n  \"nickName\": \"Vas\",\r\n  \"language\": \"telugu\",\r\n  \"yearOfJoining\": \"2020\"\r\n\r\n\r\n\r\n\r\n\r\n\r\n}]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/employeerecord?soqlWhereClause=contactNumber__c='9133973973'&applicantion__c='selected'",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"employeerecord"
+							],
+							"query": [
+								{
+									"key": "soqlWhereClause",
+									"value": "contactNumber__c='9133973973'"
+								},
+								{
+									"key": "applicantion__c",
+									"value": "'selected'"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "compensation",
+			"item": [
+				{
+					"name": "updateSalary",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"employeeId\": \"ES00001\",\r\n        \"hike\": \"30\",\r\n        \"variablePay\": \"10\",\r\n        \"year\": \"2021\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/compensation/ES00001",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"compensation",
+								"ES00001"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "sendNotification",
+			"item": [
+				{
+					"name": "http://localhost:8081/parse",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"lakshman\",\r\n    \"gmail\": \"@Mohan Lakshman\",\r\n    \"message\": \" On your special day, we wish you happiness and success. You are an amazing person and a great team player. Keep up the hard work and dedication.\"\r\n   \r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/parse",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"parse"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post-sendNotification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/v1/papi/sendNotification",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"papi",
+								"sendNotification"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

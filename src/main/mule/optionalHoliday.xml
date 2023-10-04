@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="optionalholidayapiFlow" doc:id="a934ac96-d742-49c8-a05a-f782dd589749" >
+		<ee:transform doc:name="Transform Message" doc:id="71716e19-c0fd-43ec-909f-52615cc8e8bb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="path" ><![CDATA[Mule::p('system.path.timelog.postOptional')]]></ee:set-variable>
+				<ee:set-variable variableName="method" ><![CDATA['GET']]></ee:set-variable>
+				<ee:set-variable variableName="actualPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="payloadForTimeLog" ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+var a = payload map {
+    "employeeName": $.employeeName,
+    "employeeId": $.employeeId
+}
+---
+a]]></ee:set-variable>
+				<ee:set-variable variableName="employeeId" ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+var a = payload map {
+    "employeeName": $.employeeName,
+    "employeeId": $.employeeId
+}
+---
+a.employeeId reduce($)]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="e3f9b11f-c703-45a7-929a-48f07c38a534" name="salesforce-sys-api-request"/>
+		<ee:transform doc:name="Transform Message" doc:id="621e1d6e-124a-4bf5-8233-4749ef80950a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+
+var date = (now() as Date)
+var datetostring = date as String
+var onlyValuesofPayload = valuesOf(payload[0])
+var comparingDates = onlyValuesofPayload contains  datetostring
+
+---
+comparingDates]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="29540cb2-73de-450c-bd62-a2c59f2cbdd5" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="path" ><![CDATA[Mule::p('system.path.timelog.getAttendance')]]></ee:set-variable>
+				<ee:set-variable variableName="method" ><![CDATA['GET']]></ee:set-variable>
+				<ee:set-variable variableName="datevars" ><![CDATA[%dw 2.0
+output application/json
+---
+""  ++ payload ++ ""]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="9adf07ad-6430-444c-8400-0f78f037c103" name="salesforce-sys-api-request"/>
+		<foreach doc:name="For Each" doc:id="4cbd2751-0dd5-4ab7-82bb-f6c0c385004c" >
+			<choice doc:name="Choice" doc:id="a4c95518-b44c-4d3a-b538-fda72fb93714">
+			<when expression="#[(vars.datevars != 'true') and (payload.checkInTime__c != 'null')]">
+				<set-variable value='#[(vars.notOptionalOff default []) + ("EmployeeName:" ++ payload.Name ++ ", EmployeeId: " ++ payload.employeeId__c)]' doc:name="Set Variable" doc:id="f7ebed1a-cbe9-4ce5-b9c7-69c0a285512b" variableName="notOptionalOff" />
+					<ee:transform doc:name="Transform Message" doc:id="2c24c621-c9cb-47d6-af3c-4f93c8491e1b">
+					<ee:message>
+					</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="regularDay" ><![CDATA[%dw 2.0
+output application/json
+---
+"Message": "Today is not an optional Holiday and employee's logged in are " ++ payload.employeeId__c as String ++ "," ++ payload.Name as String]]></ee:set-variable>
+						</ee:variables>
+				</ee:transform>
+					<logger level="INFO" doc:name="Logger" doc:id="11e4dbfe-9b6d-4d7b-a573-350a2f79eed0" message='#["Message": "Today is not an optional Holiday and employee " ++ payload.employeeId__c as String ++ "," ++ payload.Name as String ++ " is working as today as a regular working day"]'/>
+			</when>
+			<when expression="#[(vars.datevars != 'false') and (payload.checkInTime__c == 'null')]">
+					<ee:transform doc:name="Transform Message" doc:id="083b00bf-f036-4e90-8fb2-412979348336" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="attendancePayload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+							<ee:set-variable variableName="path" ><![CDATA[Mule::p('system.path.timelog.getLeaves')]]></ee:set-variable>
+							<ee:set-variable variableName="method" ><![CDATA['GET']]></ee:set-variable>
+							<ee:set-variable variableName="queryParams" ><![CDATA[soqlWhereClause: "employeeId__c=" ++ "'" ++  payload.employeeId__c as String ++ "'" ++ " and leaveType__c ='optional'"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="Flow Reference" doc:id="60e226cb-aacf-46f0-9d3e-f9ae46038506" name="salesforce-sys-api-request"/>
+					<ee:transform doc:name="Transform Message" doc:id="121289bb-6368-4c8f-bc94-11be839ce6d9">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload reduce($)]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<ee:transform doc:name="Transform Message" doc:id="9adf82f4-ca48-4211-9fc7-7f8f4714ed13">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var b = 1 as Number
+var c = if(payload.leaveAvailable__c >= b)
+{
+	employeeId: payload.employeeId__c,
+    leaveBooked: ((payload.leaveBooked__c) + (b)) as String,
+    totalLeaves: payload.totalLeaves__c,
+    leaveAvailable: ((payload.leaveAvailable__c) - (b)) as String,
+    Id: payload.Id,
+    leaveType: payload.leaveType__c,
+    leaveid: payload.leaveid__c,
+    employeeName: payload.Name
+}
+else 
+{
+   "message": "there is no sufficient leave balance for " ++ payload.employeeId__c as String
+}
+---
+[c]]]></ee:set-payload>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="noleavebalance" ><![CDATA[%dw 2.0
+output application/json
+var a = if(payload.leaveAvailable__c <= 0)
+{
+	employeeId: payload.employeeId__c,
+	employeeName: payload.Name
+}
+else{
+ "null": "no entries"
+}
+---
+a
+]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<choice doc:name="Choice" doc:id="90cb4d4f-08fb-4513-8d20-237fe820f86f">
+						<when expression="#[payload.leaveAvailable != null]">
+							<set-variable value='#[(vars.optionalHoliday default []) + ("EmployeeName:" ++ (payload.employeeName reduce($)) ++ ", EmployeeId: " ++ (payload.employeeId reduce($)))]' doc:name="Set Variable" doc:id="cc8be761-1926-43e1-ab83-50987c65a605" variableName="optionalHoliday" />
+							<ee:transform doc:name="Transform Message" doc:id="7155961d-928c-4fb4-9083-47b8edbdce1c">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="uriParams"><![CDATA['id': payload.employeeId joinBy " " default {}]]></ee:set-variable>
+							<ee:set-variable variableName="path"><![CDATA[Mule::p('system.path.timelog.postLeaves')]]></ee:set-variable>
+							<ee:set-variable variableName="method"><![CDATA['PATCH']]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+							<flow-ref doc:name="Flow Reference" doc:id="6210f28d-c96e-4108-9deb-af773d1c9706" name="salesforce-sys-api-request" />
+							<ee:transform doc:name="Transform Message" doc:id="dee73a7d-b74c-458b-9f16-63849af4c042">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+						</when>
+						<otherwise>
+							<set-variable value='#[(vars.noleavesOptional default []) + ("EmployeeName:" ++ vars.noleavebalance.employeeName ++ ", EmployeeId: " ++ vars.noleavebalance.employeeId)]' doc:name="Set Variable" doc:id="02569f2c-7647-4db8-beee-5701033f4b49" variableName="noleavesOptional" />
+							<ee:transform doc:name="Transform Message" doc:id="d20142df-06b6-4098-a45c-0a2d4a59c189" >
+								<ee:message >
+								</ee:message>
+								<ee:variables >
+									<ee:set-variable variableName="noLeaves" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+						</otherwise>
+					</choice>
+				</when>
+				<when expression="#[(vars.datevars != 'true') and (payload.checkInTime__c == 'null')]">
+					<set-variable value='#[(vars.regularDayNoLogin default []) + ("EmployeeName: " ++ payload.Name ++ ", EmployeeId: " ++ payload.employeeId__c)]' doc:name="Set Variable" doc:id="0ba43800-28ba-4a8c-892b-8deec6e5005b" variableName="regularDayNoLogin"/>
+				</when>
+				<otherwise>
+				<set-variable value='#[(vars.loggedInOptional default []) + ("EmployeeName: " ++ payload.Name ++ ", EmployeeId: " ++ payload.employeeId__c)]' doc:name="Set Variable" doc:id="44313416-71aa-4e6c-9eb6-9659fe2e8f50" variableName="loggedInOptional"/>
+					<ee:transform doc:name="Transform Message" doc:id="c42af46e-23f1-4252-ae0a-2571431233b5">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+					<logger level="INFO" doc:name="Logger" doc:id="0626b284-86c2-4ec0-a466-c30c1016ec4b" message='#["Message": "Today is optional Holiday but employee " ++ payload.employeeId__c as String ++ "," ++ payload.Name as String ++ " is working today"]'/>
+			</otherwise>
+		</choice>
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="3c138c7a-60e9-4f5b-9461-38e520e4be61" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	("Is today optional off? : ": vars.datevars) if !isEmpty(vars.datevars),
+	("Employees logged in": vars.notOptionalOff joinBy ";") if !isEmpty(vars.notOptionalOff),
+	("Employees absent today": vars.regularDayNoLogin joinBy ";") if !isEmpty(vars.regularDayNoLogin),
+	("Employees on optional off: ": (vars.optionalHoliday joinBy ";") as String) if !isEmpty(vars.optionalHoliday),
+	("Employees logged in on optional off": (vars.loggedInOptional default null joinBy ";") as String) if !isEmpty(vars.loggedInOptional),
+	("Employees on leave who do not have optional leave balance": (vars.noleavesOptional default null joinBy ";") as String) if !isEmpty(vars.noleavesOptional)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="globalErrorHandlerError_Handler" />
+	</flow>
+</mule>

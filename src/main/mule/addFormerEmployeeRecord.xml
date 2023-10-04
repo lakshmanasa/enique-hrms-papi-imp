@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<flow name="post-formerEmployee-flow" doc:id="8bdab19f-0311-4825-9d60-2da6cc7cb98c" >
+		<set-variable value="#[payload reduce($)]" doc:name="Set Variable" doc:id="466d2ac7-6cc2-4643-8d71-3c50efb21634" variableName="actualpayload"/>
+		<ee:transform doc:name="Fetching a record from employee object by using uriParams" doc:id="df525b4d-ef3f-43db-a86e-147ccd8885da" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="method" ><![CDATA['GET']]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA['${system.path.employee.getById}']]></ee:set-variable>
+				<ee:set-variable variableName="uriParams" ><![CDATA[id: payload.employeeId[0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Referenced to http request" doc:id="d3576196-6152-431f-8467-bddaecb7a4dc" name="salesforce-sys-api-request" target="employeeoutput"/>
+		<validation:is-not-empty-collection doc:name="Is not empty collection" doc:id="45612f1d-0301-4ba2-ae8a-e1d5940186a2" values="#[vars.employeeoutput]" message='#["These employeeID :" ++ vars.actualpayload.employeeId as String ++ " is not present in the database"]'/>
+		<ee:transform doc:name="Fetching a record from personaldetails object by using uriParams" doc:id="451afcb6-ecef-4eea-9184-022cbbe2aa89" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="method" ><![CDATA['GET']]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA['${system.path.personalDetail.getById}']]></ee:set-variable>
+				<ee:set-variable variableName="uriParams" ><![CDATA[id: vars.employeeoutput.employeeId__c joinBy ""]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Referenced to http requestt" doc:id="2f7d04fd-9566-4478-8193-b92dc849ba80" name="salesforce-sys-api-request" target="personaldetailsoutput"/>
+		<ee:transform doc:name="Fetching a record from project object by using uriParams" doc:id="bae20cd1-6e61-448e-a3f9-ea89e0d47dd6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="method" ><![CDATA['GET']]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA['${system.path.project.getById}']]></ee:set-variable>
+				<ee:set-variable variableName="uriParams" ><![CDATA[id: vars.employeeoutput.employeeId__c joinBy ""]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Referenced to http requestt" doc:id="a29d81c2-5780-401e-b316-ce667dc79837" name="salesforce-sys-api-request" target="projectoutput"/>
+		<ee:transform doc:name="inserting a record into formerEmployee Object" doc:id="d768c301-ad28-4622-875a-3038615b3ebd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var projectName = ((vars.projectoutput)reduce($$ ++ $)).*Name joinBy ","
+var technology = ((vars.projectoutput)reduce($$ ++ $)).*technology__c joinBy ","
+---
+[{
+	contactNumber: vars.employeeoutput.mobileNumber__c joinBy " ",
+	dateOfJoined: vars.employeeoutput.dateOfJoining__c joinBy " ",
+	emailId: vars.personaldetailsoutput.emailId__c joinBy " ",
+	employeeId: vars.employeeoutput.employeeId__c joinBy " ",
+	employeeName: vars.employeeoutput.Name joinBy " ",
+	yearsWorked: ((now().year) - (vars.employeeoutput.yearOfJoining__c joinBy " ")) as String ++ " years" as String,
+	lastWorkingDate: ((now() as Date)as String),
+	projectName: (projectName) ,
+	technology: (technology)  	
+	
+	
+}]]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="method" ><![CDATA['POST']]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA['${system.path.formerEmployee.postFormerEmployee}']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Referenced to http request" doc:id="6a3f3e10-b3bc-431e-8864-8d44404b57e3" name="salesforce-sys-api-request" target="formerEmployeeoutput"/>
+		<choice doc:name="Choice" doc:id="63915f64-1b2c-43ad-8995-89c312f26dbd" >
+			<when expression="#[vars.formerEmployeeoutput.successful == true]">
+				<ee:transform doc:name="Deleting a record from project object by using uriParams" doc:id="cf8b7e5e-7a27-4401-8afa-dac0bdec0e5d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="method"><![CDATA['DELETE']]></ee:set-variable>
+				<ee:set-variable variableName="path"><![CDATA['${system.path.project.deleteProject}']]></ee:set-variable>
+				<ee:set-variable variableName="uriParams"><![CDATA[id: vars.employeeoutput.employeeId__c joinBy ""]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="Referenced to http request" doc:id="50ee7ca1-f89e-46da-a18f-c1f359d7a5b4" name="salesforce-sys-api-request" target="project"/>
+				<ee:transform doc:name="Deleting the personalDetails record" doc:id="bf1246ce-f903-4a26-aee0-6167d2b7d770">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="method"><![CDATA['DELETE']]></ee:set-variable>
+				<ee:set-variable variableName="path"><![CDATA['${system.path.personalDetail.deletePersonalDetail}']]></ee:set-variable>
+				<ee:set-variable variableName="uriParams"><![CDATA[id: vars.employeeoutput.employeeId__c joinBy ""]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="Referenced to http requestt" doc:id="d88770c4-af1f-4a90-a210-44b6e0fd1aa1" name="salesforce-sys-api-request" target="personalDetails" />
+				<ee:transform doc:name="Deleting the departmentDetails record" doc:id="eec3ff17-a0f2-4afb-8ea8-1950a0715768">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="uriParams"><![CDATA[id: vars.employeeoutput.employeeId__c joinBy ""]]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA['DELETE']]></ee:set-variable>
+				<ee:set-variable variableName="path"><![CDATA['${system.path.department.deleteDepartment}']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="Referenced to http request" doc:id="2d150cc3-1668-40fa-860b-19b65e8ef518" name="salesforce-sys-api-request" target="department" />
+				<ee:transform doc:name="Deleting the employee record" doc:id="19476c30-72ee-42da-b8eb-f7b48e719f76">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="method"><![CDATA['DELETE']]></ee:set-variable>
+				<ee:set-variable variableName="path"><![CDATA['${system.path.employee.deleteEmployee}']]></ee:set-variable>
+				<ee:set-variable variableName="uriParams"><![CDATA[id: vars.employeeoutput.employeeId__c joinBy ""]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="Referenced to http request" doc:id="5486665c-15e2-4942-8df0-e7453e7581fd" name="salesforce-sys-api-request" target="employee"/>
+				<ee:transform doc:name="Transform Message" doc:id="aca8f997-742b-4ee2-992a-4e4daf73f96e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.employee]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="d96764b6-ed05-4e83-99d2-af737e839be6" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": " Already this employeeID :" ++ vars.employeeoutput.employeeId__c[0]as String ++ " exists in the formerEmployee object and removed this employeeID from employee object, department object, project object and personalDetails object"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<error-handler ref="globalErrorHandlerError_Handler" />
+	</flow>
+</mule>

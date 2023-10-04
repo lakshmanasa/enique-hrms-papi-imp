@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="get-employee-flow" doc:id="5c5d1dd5-acec-40d6-9c23-f31900f5c7ed" >
+		<scheduler doc:name="Scheduler" doc:id="89bcd713-b10b-4efb-867f-ee9f2546df06" >
+			<scheduling-strategy >
+				<cron expression=" 0 0 8 ? * * *" />
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="Fetching all record from employee object" doc:id="f05463fd-e743-4103-b570-2d83df7a43d3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="method" ><![CDATA['GET']]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA['${system.path.employee.getAll}']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Referenced to http request" doc:id="18d8b11c-e2ae-4b84-a53b-a829892c50de" name="salesforce-sys-api-request"/>
+		<ee:transform doc:name="Converting payload into Json" doc:id="b09e9c09-e8c1-4ed2-8f97-35a8472621fb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Calling to sub-flow" doc:id="d6389b5f-3e53-48c0-8d90-3b4ac3fc0585" name="birthdayFlow1" target="fromsubflow"/>
+		<foreach doc:name="For Each" doc:id="fe83db99-3f97-4a4d-92f9-6431441a7007" >
+			<choice doc:name="Choice" doc:id="2b210745-ef4d-4365-bb16-474be2f9cd5f">
+			<when expression='#[payload.dateOfBirth__c == ((now() as Date) as String {format: "dd-MMMM"})]'>
+				<email:send doc:name="Sending mail to H.R" doc:id="43087367-1557-4364-bec7-8fc3373c44ec" fromAddress="${send1.fromaddress}" subject='"BIRTHDAY"' config-ref="Email_SMTP">
+			<email:to-addresses >
+							<email:to-address value="${send1.toaddress}" />
+						</email:to-addresses>
+						<email:body contentType="text/plain">
+							<email:content ><![CDATA[#[" Today " ++ payload.Name as String ++ ":" ++ payload.employeeId__c as String ++ " Birthday"]]]></email:content>
+						</email:body>
+		</email:send>
+					<set-variable value='#[(vars.a default []) + ("Today " ++ payload.Name as String ++ ":" ++ payload.employeeId__c as String ++ " Birthday")]' doc:name="Storing the payload " doc:id="ca912657-9e57-483d-9f8c-f7743f8811a6" variableName="a"/>
+			</when>
+				<otherwise>
+					<logger level="INFO" doc:name="Logger" doc:id="4f71b160-c14d-4000-a014-6be90de792ab" message='#["NOT FOUND"]'/>
+				</otherwise>
+		</choice>
+		</foreach>
+		<ee:transform doc:name="storing the output which is coming from For-Each" doc:id="70abda99-b50c-4b1a-936b-4ef542e174fd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Birthday": vars.a default " No Birthday found",
+	"Work-Anniversary": vars.fromsubflow default " No Work Anniversary found"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="globalErrorHandlerError_Handler" />
+	</flow>
+	<flow name="birthdayFlow1" doc:id="4e9818a2-243f-4493-9854-08fe54705144" >
+		<foreach doc:name="For Each1" doc:id="19eadfe9-24ea-4133-ae0d-c42b9048a147" >
+			<choice doc:name="Choice" doc:id="ad25c122-f128-4deb-bd39-508c8f7b52b2">
+			<when expression='#[payload.dateOfJoining__c == ((now() as Date) as String {format: "dd-MMMM"})]'>
+				<email:send doc:name="Sending mail to H.R." doc:id="b7d993ae-cd52-4006-85e0-72d577b1d544" fromAddress="${send1.fromaddress}" subject="WORK ANNIVERSARY" config-ref="Email_SMTP">
+					<email:to-addresses>
+						<email:to-address value="${send1.toaddress}" />
+					</email:to-addresses>
+						<email:body contentType="text/plain">
+							<email:content ><![CDATA[#[" Today " ++ payload.Name as String ++ ":" ++ payload.employeeId__c as String ++ " work anniversary"]]]></email:content>
+						</email:body>
+				</email:send>
+					<set-variable value='#[(vars.a default []) + ("Today " ++ payload.Name as String ++ ":" ++ payload.employeeId__c as String ++ " Work-Anniversary")]' doc:name="Storing the payload " doc:id="5a03eb84-8bdb-44e8-a052-43c699a6e5a4" variableName="a" />
+			</when>
+				<otherwise>
+					<logger level="INFO" doc:name="Logger" doc:id="b7ad6cda-17b1-4adf-9868-7474c8229814" message='#["NOT FOUND"]'/>
+			</otherwise>
+		</choice>
+		</foreach>
+		<ee:transform doc:name="storing the output which is coming from For-Each" doc:id="306987a8-1760-49a8-b779-8bffaed5476a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.a
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="globalErrorHandlerError_Handler" />
+	</flow>
+	<flow name="birthdayFlow" doc:id="01fd2e5b-3188-46e7-a1ee-15665962d762" >
+		<http:listener doc:name="Listener" doc:id="d34746ad-dc11-448d-9861-13736dbc30fd" config-ref="enique-hrms-papi-httpListenerConfig" path="/parse" allowedMethods="POST"/>
+		<parse-template doc:name="Parse Template" doc:id="bd3e8992-3efb-4d8e-b40c-9d39ab3a2467" location="first.html" target="first"/>
+		<email:send doc:name="Send" doc:id="29ace1a3-d6aa-41ff-85a6-2cc4f897d880" config-ref="Email_SMTP" subject="BIRTHDAY" fromAddress="${send1.fromaddress}">
+			<email:to-addresses >
+				<email:to-address value="${send1.fromaddress}" />
+			</email:to-addresses>
+			<email:body contentType="text/html">
+				<email:content ><![CDATA[#[vars.first]]]></email:content>
+			</email:body>
+		</email:send>
+		<set-payload value="#[vars.first]" doc:name="Set Payload" doc:id="f355e3f7-68b7-4148-9350-6af5d4b16916" />
+		<error-handler ref="globalErrorHandlerError_Handler" />
+	</flow>
+</mule>
